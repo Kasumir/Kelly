@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText et;
     private Bitmap bmp;
     private ImageView iv;
+    private ImageView Iv[];
     private Typeface[] tf = new Typeface[7];
     private Button btn;
     private ListPopupWindow list;
@@ -75,7 +77,9 @@ public class MainActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(et.getText().toString().length()>0) {
                     iv.setVisibility(View.VISIBLE);
-                    iv.setImageBitmap(TexttoBitmap(et.getText().toString(), userTextSize, et.getCurrentTextColor(), tf[userfont]));
+
+                    //iv.setImageBitmap(TexttoBitmap(et.getText().toString().substring(et.getText().toString().length() - 1,et.getText().toString().length()), userTextSize, et.getCurrentTextColor(), tf[userfont]));
+                    initIv();
                     jamo();
                 }
                 else {
@@ -230,4 +234,17 @@ public class MainActivity extends AppCompatActivity {
         jamo.setText(result);
     }
 
+    public void initIv()
+    {
+        Iv = new ImageView[et.getText().toString().length()];
+        RelativeLayout rl = (RelativeLayout) findViewById(R.id.RL);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+        for(int i = 0; i < et.getText().toString().length(); i++)
+        {
+            Iv[i] = new ImageView(this);
+            Iv[i].setImageBitmap(TexttoBitmap(et.getText().toString().substring(i,i+1), userTextSize, et.getCurrentTextColor(), tf[userfont]));
+            rl.addView(Iv[i], lp);
+        }
+    }
 }
