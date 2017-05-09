@@ -245,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
             Iv[i] = new ImageView(this);
             Iv[i].setImageBitmap(TexttoBitmap(et.getText().toString().substring(i,i+1), userTextSize, et.getCurrentTextColor(), tf[userfont]));
             rl.addView(Iv[i], lp);
+
         }
     }
 }
