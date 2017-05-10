@@ -2,6 +2,7 @@ package org.androidtown.image;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -99,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
         paint.setColor(textColor);
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(tf);
+        Paint paintRec = new Paint();
+        paintRec.setColor(Color.RED);
         float baseline = -paint.ascent(); // ascent() is negative
         int width = (int) (paint.measureText(text) + 0.5f); // round
         int height = (int) (baseline + paint.descent() + 0.5f);
@@ -106,7 +109,9 @@ public class MainActivity extends AppCompatActivity {
         Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(image);
+        canvas.drawRect(0,0,width,height,paintRec);
         canvas.drawText(text, 0, baseline, paint);
+
         return image;
     }
     public void fontswitch(int position)
@@ -236,16 +241,30 @@ public class MainActivity extends AppCompatActivity {
 
     public void initIv()
     {
-        Iv = new ImageView[et.getText().toString().length()];
         RelativeLayout rl = (RelativeLayout) findViewById(R.id.RL);
+        RelativeLayout.LayoutParams ivlp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+        Iv = new ImageView[et.getText().toString().length()];
+        for(int i = 0; i < et.getText().toString().length(); i++)
+        {
+            //Iv[i].setLayoutParams(ivlp);
+        }
+
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+        lp.addRule(RelativeLayout.BELOW, R.id.imageView);
+
 
         for(int i = 0; i < et.getText().toString().length(); i++)
         {
             Iv[i] = new ImageView(this);
             Iv[i].setImageBitmap(TexttoBitmap(et.getText().toString().substring(i,i+1), userTextSize, et.getCurrentTextColor(), tf[userfont]));
-            rl.addView(Iv[i], lp);
-
+            Iv[i].setId(i);
+            if(i > 0){
+                lp.addRule(RelativeLayout.LEFT_OF, i);
+                rl.addView(Iv[i], lp);
+                lp.removeRule(RelativeLayout.LEFT_OF);
+            }
+            else
+                rl.addView(Iv[i], lp);
         }
     }
 }
