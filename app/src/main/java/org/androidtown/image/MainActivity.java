@@ -2,7 +2,6 @@ package org.androidtown.image;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -10,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ListPopupWindow;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 
@@ -26,13 +25,11 @@ public class MainActivity extends AppCompatActivity {
     private float userTextSize;
 
     private EditText et;
-    private Bitmap bmp;
-    private ImageView iv;
     private ImageView Iv[];
     private Typeface[] tf = new Typeface[7];
     private Button btn;
     private ListPopupWindow list;
-    private TextView jamo;
+    private RelativeLayout rl;
     private String[] font = {"나눔", "나눔바른고딕", "나눔바른고딕볼드", "나눔바른펜", "나눔핸드브러시","나눔명조-옛한글", "나눔펜"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         userfont = 0;
         userTextSize = 48;
         //init UI
-        jamo = (TextView)findViewById(R.id.jamo);
+        rl = (RelativeLayout) findViewById(R.id.RL);
         btn = (Button) findViewById(R.id.button);
         list = new ListPopupWindow(this);
         list.setWidth(300);
@@ -65,9 +62,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        iv = (ImageView) findViewById(R.id.imageView);
-        iv.setVisibility(View.INVISIBLE);
         et = (EditText) findViewById(R.id.edittext);
         et.addTextChangedListener(new TextWatcher() {
             @Override
@@ -77,14 +71,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(et.getText().toString().length()>0) {
-                    iv.setVisibility(View.VISIBLE);
-
-                    //iv.setImageBitmap(TexttoBitmap(et.getText().toString().substring(et.getText().toString().length() - 1,et.getText().toString().length()), userTextSize, et.getCurrentTextColor(), tf[userfont]));
-                    initIv();
-                    jamo();
+                    initIv(jamo());
                 }
                 else {
-                    iv.setVisibility(View.INVISIBLE);
+                            rl.removeAllViews();
                 }
             }
             @Override
@@ -100,8 +90,7 @@ public class MainActivity extends AppCompatActivity {
         paint.setColor(textColor);
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(tf);
-        Paint paintRec = new Paint();
-        paintRec.setColor(Color.RED);
+
         float baseline = -paint.ascent(); // ascent() is negative
         int width = (int) (paint.measureText(text) + 0.5f); // round
         int height = (int) (baseline + paint.descent() + 0.5f);
@@ -109,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
         Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(image);
-        canvas.drawRect(0,0,width,height,paintRec);
         canvas.drawText(text, 0, baseline, paint);
 
         return image;
@@ -120,58 +108,44 @@ public class MainActivity extends AppCompatActivity {
             case 0:
                 userfont = 0;
                 if(et.getText().toString().length()>0) {
-                    iv.setVisibility(View.VISIBLE);
-                    iv.setImageBitmap(TexttoBitmap(et.getText().toString(), userTextSize, et.getCurrentTextColor(), tf[userfont]));
-                }else
-                    iv.setVisibility(View.INVISIBLE);
+                    initIv(jamo());
+                }
                 break;
             case 1:
                 userfont = 1;
                 if(et.getText().toString().length()>0) {
-                    iv.setVisibility(View.VISIBLE);
-                    iv.setImageBitmap(TexttoBitmap(et.getText().toString(), userTextSize, et.getCurrentTextColor(), tf[userfont]));
-                }else
-                    iv.setVisibility(View.INVISIBLE);
+                    initIv(jamo());
+                }
                 break;
             case 2:
                 userfont = 2;
                 if(et.getText().toString().length()>0) {
-                    iv.setVisibility(View.VISIBLE);
-                    iv.setImageBitmap(TexttoBitmap(et.getText().toString(), userTextSize, et.getCurrentTextColor(), tf[userfont]));
-                }else
-                    iv.setVisibility(View.INVISIBLE);
+                    initIv(jamo());
+                }
                 break;
             case 3:
                 userfont = 3;
                 if(et.getText().toString().length()>0) {
-                    iv.setVisibility(View.VISIBLE);
-                    iv.setImageBitmap(TexttoBitmap(et.getText().toString(), userTextSize, et.getCurrentTextColor(), tf[userfont]));
-                }else
-                    iv.setVisibility(View.INVISIBLE);
+                    initIv(jamo());
+                }
                 break;
             case 4:
                 userfont = 4;
                 if(et.getText().toString().length()>0) {
-                    iv.setVisibility(View.VISIBLE);
-                    iv.setImageBitmap(TexttoBitmap(et.getText().toString(), userTextSize, et.getCurrentTextColor(), tf[userfont]));
-                }else
-                    iv.setVisibility(View.INVISIBLE);
+                    initIv(jamo());
+                }
                 break;
             case 5:
                 userfont = 5;
                 if(et.getText().toString().length()>0) {
-                    iv.setVisibility(View.VISIBLE);
-                    iv.setImageBitmap(TexttoBitmap(et.getText().toString(), userTextSize, et.getCurrentTextColor(), tf[userfont]));
-                }else
-                    iv.setVisibility(View.INVISIBLE);
+                    initIv(jamo());
+                }
                 break;
             case 6:
                 userfont = 6;
                 if(et.getText().toString().length()>0) {
-                    iv.setVisibility(View.VISIBLE);
-                    iv.setImageBitmap(TexttoBitmap(et.getText().toString(), userTextSize, et.getCurrentTextColor(), tf[userfont]));
-                }else
-                    iv.setVisibility(View.INVISIBLE);
+                    initIv(jamo());
+                }
                 break;
         }
     }
@@ -187,14 +161,16 @@ public class MainActivity extends AppCompatActivity {
     public void fontsizeupClicked(View v)
     {
         userTextSize+=4;
-        iv.setImageBitmap(TexttoBitmap(et.getText().toString(), userTextSize, et.getCurrentTextColor(), tf[userfont]));
+        if(et.getText().toString().length() > 0)
+            initIv(jamo());
     }
 
     public void fontsizedownClicked(View v)
     {
         if(userTextSize > 4)
             userTextSize-=4;
-        iv.setImageBitmap(TexttoBitmap(et.getText().toString(), userTextSize, et.getCurrentTextColor(), tf[userfont]));
+        if(et.getText().toString().length() > 0)
+            initIv(jamo());
     }
 
     private static final char[] CHO =
@@ -212,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
                     0x313b, 0x313c, 0x313d, 0x313e, 0x313f, 0x3140, 0x3141, 0x3142, 0x3144, 0x3145,
                     0x3146, 0x3147, 0x3148, 0x314a, 0x314b, 0x314c, 0x314d, 0x314e};
 
-    public void jamo()
+    public String jamo()  //editText의 내용을 자모분리한 문자열 리턴
     {
         String str = et.getText().toString();
         int a,b,c;
@@ -236,35 +212,56 @@ public class MainActivity extends AppCompatActivity {
             else //한글이 아니면
                 result += ch;
         }
-        jamo.setText(result);
+        return result;
     }
 
-    public void initIv()
+    public void initIv(String str)
     {
-        RelativeLayout rl = (RelativeLayout) findViewById(R.id.RL);
-        RelativeLayout.LayoutParams ivlp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-        Iv = new ImageView[et.getText().toString().length()];
-        for(int i = 0; i < et.getText().toString().length(); i++)
-        {
-            //Iv[i].setLayoutParams(ivlp);
-        }
+        rl.removeAllViews();                                               //모든뷰 박살
+        Iv = new ImageView[str.length()];             //문자열 길이만큼의 이미지뷰 할당
 
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-        lp.addRule(RelativeLayout.BELOW, R.id.imageView);
-
-
-        for(int i = 0; i < et.getText().toString().length(); i++)
+        for(int i = 0; i < str.length(); i++)         //모든 뷰에 id할당
         {
             Iv[i] = new ImageView(this);
-            Iv[i].setImageBitmap(TexttoBitmap(et.getText().toString().substring(i,i+1), userTextSize, et.getCurrentTextColor(), tf[userfont]));
-            Iv[i].setId(i);
-            if(i > 0){
-                lp.addRule(RelativeLayout.LEFT_OF, i);
-                rl.addView(Iv[i], lp);
-                lp.removeRule(RelativeLayout.LEFT_OF);
-            }
-            else
-                rl.addView(Iv[i], lp);
+            Iv[i].setId(View.generateViewId());
+            Iv[i].setOnTouchListener(new View.OnTouchListener() {
+                float x;
+                float y;
+                public boolean onTouch(View v, MotionEvent ev){
+                    switch (ev.getAction()) {
+                        case MotionEvent.ACTION_DOWN: {
+                            x = v.getX() - ev.getRawX(); // 손으로누른좌표랑 이미지왼쪽위좌표값의 차이값
+                            y = v.getY() - ev.getRawY();
+                            break;
+                        }
+                        case MotionEvent.ACTION_MOVE: {
+                            v.animate().x(ev.getRawX() + x).y(ev.getRawY() + y).setDuration(0).start(); // 이동시켜주는함수.
+                        }
+                        break;
+                        case MotionEvent.ACTION_CANCEL: //터치모션 캔슬되었을 때. 아무것도안함.
+                        case MotionEvent.ACTION_UP: // 손가락뗏을때. 아무것도안함.
+                            break;
+                        default:
+                            return false;
+                    }
+                    return true;
+                }
+            });
+        }
+        RelativeLayout.LayoutParams lpfirst = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+        lpfirst.addRule(RelativeLayout.CENTER_IN_PARENT, R.id.RL);
+        lpfirst.addRule(RelativeLayout.ALIGN_PARENT_LEFT, R.id.RL);
+
+
+        Iv[0].setImageBitmap(TexttoBitmap(str.substring(0, 1), userTextSize, et.getCurrentTextColor(), tf[userfont]));
+        rl.addView(Iv[0], lpfirst);
+        for(int i = 1; i < str.length(); i++)
+        {
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+            Iv[i].setImageBitmap(TexttoBitmap(str.substring(i,i+1), userTextSize, et.getCurrentTextColor(), tf[userfont]));
+            lp.addRule(RelativeLayout.CENTER_IN_PARENT, R.id.RL);
+            lp.addRule(RelativeLayout.RIGHT_OF, Iv[i - 1].getId());
+            rl.addView(Iv[i], lp);
         }
     }
 }
