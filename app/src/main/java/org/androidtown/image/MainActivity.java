@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private float userTextSize;
 
     private EditText et;
+    private ImageView dragIv;
     private ImageView Iv[];
     private Typeface[] tf = new Typeface[7];
     private Button btn;
@@ -50,6 +51,89 @@ public class MainActivity extends AppCompatActivity {
         userTextSize = 48;
         //init UI
         rl = (RelativeLayout) findViewById(R.id.RL);
+        dragIv = new ImageView(this);
+        rl.addView(dragIv);
+        dragIv.setVisibility(View.INVISIBLE);
+        rl.setOnTouchListener(new View.OnTouchListener() {
+            float x;
+            float y;
+            float width;
+            float height;
+            Bitmap bmp;
+            public boolean onTouch(View v, MotionEvent ev){
+                switch (ev.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        x = ev.getX();
+                        y = ev.getY();
+                        break;
+                    }
+                    case MotionEvent.ACTION_MOVE: {
+                        if(x < ev.getX() && y < ev.getY()){
+                            dragIv.setVisibility(View.VISIBLE);
+                            dragIv.setX(x); dragIv.setY(y);
+                            width = ev.getX() - x;
+                            height = ev.getY() - y;
+                            bmp = createBitmap((int)width, (int)height, Bitmap.Config.ARGB_8888);
+                            Canvas canvas = new Canvas(bmp);
+                            Paint paint = new Paint(ANTI_ALIAS_FLAG);
+                            paint.setColor(Color.BLUE);
+                            paint.setAlpha(5);
+                            canvas.drawRect(0,0,width,height, paint);
+                            dragIv.setImageBitmap(bmp);
+                        }
+                        else if(x < ev.getX() && y > ev.getY()){
+                            dragIv.setVisibility(View.VISIBLE);
+                            dragIv.setX(x); dragIv.setY(ev.getY());
+                            width = ev.getX() - x;
+                            height = y - ev.getY();
+                            bmp = createBitmap((int)width, (int)height, Bitmap.Config.ARGB_8888);
+                            Canvas canvas = new Canvas(bmp);
+                            Paint paint = new Paint(ANTI_ALIAS_FLAG);
+                            paint.setColor(Color.BLUE);
+                            paint.setAlpha(5);
+                            canvas.drawRect(0,0,width,height, paint);
+                            dragIv.setImageBitmap(bmp);
+                        }
+                        else if(x > ev.getX() && y > ev.getY()){
+                            dragIv.setVisibility(View.VISIBLE);
+                            dragIv.setX(ev.getX()); dragIv.setY(ev.getY());
+                            width = x - ev.getX();
+                            height = y - ev.getY();
+                            bmp = createBitmap((int)width, (int)height, Bitmap.Config.ARGB_8888);
+                            Canvas canvas = new Canvas(bmp);
+                            Paint paint = new Paint(ANTI_ALIAS_FLAG);
+                            paint.setColor(Color.BLUE);
+                            paint.setAlpha(5);
+                            canvas.drawRect(0,0,width,height, paint);
+                            dragIv.setImageBitmap(bmp);
+                        }
+                        else if(x > ev.getX() && y < ev.getY()){
+                            dragIv.setVisibility(View.VISIBLE);
+                            dragIv.setX(ev.getX()); dragIv.setY(y);
+                            width = x - ev.getX();
+                            height = ev.getY() - y;
+                            bmp = createBitmap((int)width, (int)height, Bitmap.Config.ARGB_8888);
+                            Canvas canvas = new Canvas(bmp);
+                            Paint paint = new Paint(ANTI_ALIAS_FLAG);
+                            paint.setColor(Color.BLUE);
+                            paint.setAlpha(5);
+                            canvas.drawRect(0,0,width,height, paint);
+                            dragIv.setImageBitmap(bmp);
+                        }
+                    }
+                    break;
+                    case MotionEvent.ACTION_CANCEL:
+                        dragIv.setVisibility(View.INVISIBLE);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        dragIv.setVisibility(View.INVISIBLE);
+                        break;
+                    default:
+                        return false;
+                }
+                return true;
+            }
+        });
         btn = (Button) findViewById(R.id.button);
         list = new ListPopupWindow(this);
         list.setWidth(300);
@@ -106,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
         int width = (int) (paint.measureText(text) + 0.5f); // round
         int height = (int) (baseline + paint.descent() + 0.5f);
 
-        Bitmap image = createBitmap(width*4, height*4, Bitmap.Config.ARGB_8888);
+        Bitmap image = createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(image);
         //canvas.translate(baseline,0);
