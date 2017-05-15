@@ -2,6 +2,7 @@ package org.androidtown.image;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import static android.graphics.Bitmap.createBitmap;
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 
 public class MainActivity extends AppCompatActivity {
@@ -87,17 +89,29 @@ public class MainActivity extends AppCompatActivity {
     public Bitmap TexttoBitmap(String text, float textSize, int textColor, Typeface tf) {
         Paint paint = new Paint(ANTI_ALIAS_FLAG);
         paint.setTextSize(textSize);
+        paint.setStyle(Paint.Style.FILL);
         paint.setColor(textColor);
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(tf);
+
+        Paint strokePaint = new Paint(ANTI_ALIAS_FLAG);
+        strokePaint.setTextSize(textSize);
+        strokePaint.setColor(Color.RED);
+        strokePaint.setStyle(Paint.Style.STROKE);
+        strokePaint.setTextAlign(Paint.Align.LEFT);
+        strokePaint.setTypeface(tf);
+        strokePaint.setStrokeWidth(10);
 
         float baseline = -paint.ascent(); // ascent() is negative
         int width = (int) (paint.measureText(text) + 0.5f); // round
         int height = (int) (baseline + paint.descent() + 0.5f);
 
-        Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Bitmap image = createBitmap(width*4, height*4, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(image);
+        //canvas.translate(baseline,0);
+        //canvas.rotate(userRotate,width / 2, height / 2);
+        canvas.drawText(text,0,baseline, strokePaint);
         canvas.drawText(text, 0, baseline, paint);
 
         return image;
