@@ -22,14 +22,13 @@
 
             <Button
                 android:id="@+id/button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="60dp"
                 android:onClick="onbtnClicked"
-                android:text="font"
-                tools:layout_editor_absoluteX="288dp"
-                tools:layout_editor_absoluteY="8dp"
+                android:background="@drawable/font"
                 android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true" />
+                android:layout_alignParentEnd="true"
+                />
         </RelativeLayout>
 
         <RelativeLayout
@@ -53,23 +52,28 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/fontsizeup"/>
 
-        <Button
+        <ImageButton
             android:id="@+id/fontsizedown"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_alignParentBottom="true"
             android:layout_toStartOf="@+id/fontsizeup"
             android:onClick="fontsizedownClicked"
-            android:text="-" />
+            android:scaleType="fitXY"
+            android:background="@android:color/transparent"
+            android:src="@drawable/minus"/>
 
-        <Button
+        <ImageButton
             android:id="@+id/fontsizeup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:onClick="fontsizeupClicked"
-            android:text="+" />
+            android:src="@drawable/plus"
+            android:background="@android:color/transparent"
+            android:scaleType="fitXY"
+             />
     </RelativeLayout>
     </LinearLayout>
 
