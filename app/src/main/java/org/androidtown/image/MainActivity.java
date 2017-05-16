@@ -1,5 +1,6 @@
 package org.androidtown.image;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,6 +13,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private ListPopupWindow list;
     private RelativeLayout rl;
     private String[] font = {"나눔", "나눔바른고딕", "나눔바른고딕볼드", "나눔바른펜", "나눔핸드브러시","나눔명조-옛한글", "나눔펜"};
+    private View.OnTouchListener layoutTouchListener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,10 +54,11 @@ public class MainActivity extends AppCompatActivity {
         userTextSize = 48;
         //init UI
         rl = (RelativeLayout) findViewById(R.id.RL);
+        Iv = new ImageView[100];
         dragIv = new ImageView(this);
         rl.addView(dragIv);
         dragIv.setVisibility(View.INVISIBLE);
-        rl.setOnTouchListener(new View.OnTouchListener() {
+        rl.setOnTouchListener(layoutTouchListener = new View.OnTouchListener() {
             float x;
             float y;
             float width;
@@ -156,12 +160,10 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(et.getText().toString().length()>0) {
+                if(et.getText().toString().length()>0)
                     initIv(jamo());
-                }
-                else {
-                            rl.removeAllViews();
-                }
+                else
+                    rl.removeAllViews();
             }
             @Override
             public void afterTextChanged(Editable s) {
@@ -169,7 +171,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
     public Bitmap TexttoBitmap(String text, float textSize, int textColor, Typeface tf) {
         Paint paint = new Paint(ANTI_ALIAS_FLAG);
         paint.setTextSize(textSize);
@@ -315,7 +316,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void initIv(String str)
     {
-        rl.removeAllViews();                                               //모든뷰 박살
         Iv = new ImageView[str.length()];             //문자열 길이만큼의 이미지뷰 할당
 
         for(int i = 0; i < str.length(); i++)         //모든 뷰에 id할당
@@ -363,3 +363,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
+
+
+
