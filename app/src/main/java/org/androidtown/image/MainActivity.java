@@ -1,6 +1,5 @@
 package org.androidtown.image;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -13,7 +12,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -55,6 +53,35 @@ public class MainActivity extends AppCompatActivity {
         //init UI
         rl = (RelativeLayout) findViewById(R.id.RL);
         Iv = new ImageView[100];
+        for(int i = 0; i < 100; i++){
+            Iv[i] = new ImageView(this);
+            rl.addView(Iv[i]);
+            Iv[i].setId(View.generateViewId());
+            Iv[i].setVisibility(View.INVISIBLE);
+            Iv[i].setOnTouchListener(new View.OnTouchListener() {
+                float x;
+                float y;
+                public boolean onTouch(View v, MotionEvent ev){
+                    switch (ev.getAction()) {
+                        case MotionEvent.ACTION_DOWN: {
+                            x = v.getX() - ev.getRawX(); // 손으로누른좌표랑 이미지왼쪽위좌표값의 차이값
+                            y = v.getY() - ev.getRawY();
+                            break;
+                        }
+                        case MotionEvent.ACTION_MOVE: {
+                            v.animate().x(ev.getRawX() + x).y(ev.getRawY() + y).setDuration(0).start(); // 이동시켜주는함수.
+                        }
+                        break;
+                        case MotionEvent.ACTION_CANCEL: //터치모션 캔슬되었을 때. 아무것도안함.
+                        case MotionEvent.ACTION_UP: // 손가락뗏을때. 아무것도안함.
+                            break;
+                        default:
+                            return false;
+                    }
+                    return true;
+                }
+            });
+        }
         dragIv = new ImageView(this);
         rl.addView(dragIv);
         dragIv.setVisibility(View.INVISIBLE);
@@ -163,7 +190,8 @@ public class MainActivity extends AppCompatActivity {
                 if(et.getText().toString().length()>0)
                     initIv(jamo());
                 else
-                    rl.removeAllViews();
+                    for(int i = 0; i < 100; i++)
+                        Iv[i].setVisibility(View.INVISIBLE);
             }
             @Override
             public void afterTextChanged(Editable s) {
@@ -316,35 +344,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void initIv(String str)
     {
-        Iv = new ImageView[str.length()];             //문자열 길이만큼의 이미지뷰 할당
-
+        for(int i = 0; i < 100; i++) {
+            rl.removeView(Iv[i]);
+            Iv[i].setVisibility(View.INVISIBLE);
+        }
         for(int i = 0; i < str.length(); i++)         //모든 뷰에 id할당
         {
-            Iv[i] = new ImageView(this);
-            Iv[i].setId(View.generateViewId());
-            Iv[i].setOnTouchListener(new View.OnTouchListener() {
-                float x;
-                float y;
-                public boolean onTouch(View v, MotionEvent ev){
-                    switch (ev.getAction()) {
-                        case MotionEvent.ACTION_DOWN: {
-                            x = v.getX() - ev.getRawX(); // 손으로누른좌표랑 이미지왼쪽위좌표값의 차이값
-                            y = v.getY() - ev.getRawY();
-                            break;
-                        }
-                        case MotionEvent.ACTION_MOVE: {
-                            v.animate().x(ev.getRawX() + x).y(ev.getRawY() + y).setDuration(0).start(); // 이동시켜주는함수.
-                        }
-                        break;
-                        case MotionEvent.ACTION_CANCEL: //터치모션 캔슬되었을 때. 아무것도안함.
-                        case MotionEvent.ACTION_UP: // 손가락뗏을때. 아무것도안함.
-                            break;
-                        default:
-                            return false;
-                    }
-                    return true;
-                }
-            });
+            Iv[i].setVisibility(View.VISIBLE);
         }
         RelativeLayout.LayoutParams lpfirst = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
         lpfirst.addRule(RelativeLayout.CENTER_IN_PARENT, R.id.RL);
@@ -361,6 +367,8 @@ public class MainActivity extends AppCompatActivity {
             lp.addRule(RelativeLayout.RIGHT_OF, Iv[i - 1].getId());
             rl.addView(Iv[i], lp);
         }
+        for(int i = str.length(); i < 100; i++)
+            rl.addView(Iv[i]);
     }
 }
 
