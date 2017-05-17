@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         tf[6] = Typeface.createFromAsset(getAssets(), "NanumPen.ttf");
         //init user input value
         userfont = 0;
-        userTextSize = 48;
+        userTextSize = 80;
         //init UI
         rl = (RelativeLayout) findViewById(R.id.RL);
         Iv = new ImageView[100];
