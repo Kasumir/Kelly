@@ -34,7 +34,9 @@ public class MainActivity extends AppCompatActivity {
     private ListPopupWindow list;
     private RelativeLayout rl;
     private String[] font = {"나눔", "나눔바른고딕", "나눔바른고딕볼드", "나눔바른펜", "나눔핸드브러시","나눔명조-옛한글", "나눔펜"};
-    private View.OnTouchListener layoutTouchListener;
+    private IvInfo[] iinfo = new IvInfo[100];
+    private int ivFocus;
+    private int i;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         //init UI
         rl = (RelativeLayout) findViewById(R.id.RL);
         Iv = new ImageView[100];
-        for(int i = 0; i < 100; i++){
+        for(i = 0; i < 100; i++){
             Iv[i] = new ImageView(this);
             rl.addView(Iv[i]);
             Iv[i].setId(View.generateViewId());
@@ -66,10 +68,13 @@ public class MainActivity extends AppCompatActivity {
                         case MotionEvent.ACTION_DOWN: {
                             x = v.getX() - ev.getRawX(); // 손으로누른좌표랑 이미지왼쪽위좌표값의 차이값
                             y = v.getY() - ev.getRawY();
+                            ivFocus = i;
                             break;
                         }
                         case MotionEvent.ACTION_MOVE: {
                             v.animate().x(ev.getRawX() + x).y(ev.getRawY() + y).setDuration(0).start(); // 이동시켜주는함수.
+                            iinfo[ivFocus].setX(ev.getRawX() + x);
+                            iinfo[ivFocus].setY(ev.getRawY() + y);
                         }
                         break;
                         case MotionEvent.ACTION_CANCEL: //터치모션 캔슬되었을 때. 아무것도안함.
@@ -85,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         dragIv = new ImageView(this);
         rl.addView(dragIv);
         dragIv.setVisibility(View.INVISIBLE);
-        rl.setOnTouchListener(layoutTouchListener = new View.OnTouchListener() {
+        rl.setOnTouchListener(new View.OnTouchListener() {
             float x;
             float y;
             float width;
@@ -199,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     public Bitmap TexttoBitmap(String text, float textSize, int textColor, Typeface tf) {
         Paint paint = new Paint(ANTI_ALIAS_FLAG);
         paint.setTextSize(textSize);
@@ -229,6 +235,7 @@ public class MainActivity extends AppCompatActivity {
 
         return image;
     }
+
     public void fontswitch(int position)
     {
         switch(position){
@@ -355,7 +362,6 @@ public class MainActivity extends AppCompatActivity {
         RelativeLayout.LayoutParams lpfirst = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
         lpfirst.addRule(RelativeLayout.CENTER_IN_PARENT, R.id.RL);
         lpfirst.addRule(RelativeLayout.ALIGN_PARENT_LEFT, R.id.RL);
-
 
         Iv[0].setImageBitmap(TexttoBitmap(str.substring(0, 1), userTextSize, et.getCurrentTextColor(), tf[userfont]));
         rl.addView(Iv[0], lpfirst);
