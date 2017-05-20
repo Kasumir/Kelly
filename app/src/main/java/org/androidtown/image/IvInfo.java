@@ -6,12 +6,20 @@ package org.androidtown.image;
 
 public class IvInfo {
     private float x, y;
-    private int textSize;
+    private float textSize;
     private int textColor;
     private int strokeWidth;
     private int strokeColor;
     private int tfNum;
 
+    public IvInfo()
+    {
+        textSize = MainActivity.userTextSize;
+        textColor = MainActivity.userTextColor;
+        strokeWidth = MainActivity.userStrokeWidth;
+        strokeColor = MainActivity.userStrokeColor;
+        tfNum = MainActivity.userfont;
+    }
     public void setX(float x){this.x = x;}
 
     public float getX(){return x;}
@@ -20,9 +28,9 @@ public class IvInfo {
 
     public float getY(){return y;}
 
-    public void setTextSize(int ts){this.textSize = ts;}
+    public void setTextSize(float ts){this.textSize = ts;}
 
-    public int getTextSize(){return textSize;}
+    public float getTextSize(){return textSize;}
 
     public void setTextColor(int tc){this.textColor = tc;}
 
@@ -39,4 +47,12 @@ public class IvInfo {
     public void setTfNum(int num){this.tfNum = num;}
 
     public int getTfNum(){return tfNum;}
+
+    public void updateUserInput(){
+        textSize = MainActivity.userTextSize;
+        textColor = MainActivity.userTextColor;
+        strokeWidth = MainActivity.userStrokeWidth;
+        strokeColor = MainActivity.userStrokeColor;
+        tfNum = MainActivity.userfont;
+    }
 }

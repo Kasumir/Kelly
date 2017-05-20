@@ -19,24 +19,30 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import java.util.ArrayList;
+
 import static android.graphics.Bitmap.createBitmap;
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 
 public class MainActivity extends AppCompatActivity {
-    private int userfont;
-    private float userTextSize;
-
+    public static int userfont = 0;
+    public static float userTextSize = 80;
+    public static int userTextColor = Color.BLACK;
+    public static int userStrokeWidth = 10;
+    public static int userStrokeColor = Color.RED;
+    //
     private EditText et;
     private ImageView dragIv;
-    private ImageView Iv[];
     private Typeface[] tf = new Typeface[7];
     private Button btn;
     private ListPopupWindow list;
     private RelativeLayout rl;
     private String[] font = {"나눔", "나눔바른고딕", "나눔바른고딕볼드", "나눔바른펜", "나눔핸드브러시","나눔명조-옛한글", "나눔펜"};
-    private IvInfo[] iinfo = new IvInfo[100];
     private int ivFocus;
     private int i;
+    private ArrayList<Integer> selectList = new ArrayList<Integer>();
+    private IvInfo[] iinfo = new IvInfo[100];
+    private ImageView Iv[] = new ImageView[100];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,15 +56,13 @@ public class MainActivity extends AppCompatActivity {
         tf[5] = Typeface.createFromAsset(getAssets(), "NanumMyeongjo-YetHangul.otf");
         tf[6] = Typeface.createFromAsset(getAssets(), "NanumPen.ttf");
         //init user input value
-        userfont = 0;
-        userTextSize = 80;
         //init UI
         rl = (RelativeLayout) findViewById(R.id.RL);
-        Iv = new ImageView[100];
         for(i = 0; i < 100; i++){
+            iinfo[i] = new IvInfo();
             Iv[i] = new ImageView(this);
             rl.addView(Iv[i]);
-            Iv[i].setId(View.generateViewId());
+            Iv[i].setId(i+1);
             Iv[i].setVisibility(View.INVISIBLE);
             Iv[i].setOnTouchListener(new View.OnTouchListener() {
                 float x;
@@ -68,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                         case MotionEvent.ACTION_DOWN: {
                             x = v.getX() - ev.getRawX(); // 손으로누른좌표랑 이미지왼쪽위좌표값의 차이값
                             y = v.getY() - ev.getRawY();
-                            ivFocus = i;
+                            ivFocus = v.getId() - 1;
                             break;
                         }
                         case MotionEvent.ACTION_MOVE: {
@@ -113,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                             Canvas canvas = new Canvas(bmp);
                             Paint paint = new Paint(ANTI_ALIAS_FLAG);
                             paint.setColor(Color.BLUE);
-                            paint.setAlpha(5);
+                            paint.setAlpha(30);
                             canvas.drawRect(0,0,width,height, paint);
                             dragIv.setImageBitmap(bmp);
                         }
@@ -126,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                             Canvas canvas = new Canvas(bmp);
                             Paint paint = new Paint(ANTI_ALIAS_FLAG);
                             paint.setColor(Color.BLUE);
-                            paint.setAlpha(5);
+                            paint.setAlpha(30);
                             canvas.drawRect(0,0,width,height, paint);
                             dragIv.setImageBitmap(bmp);
                         }
@@ -139,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                             Canvas canvas = new Canvas(bmp);
                             Paint paint = new Paint(ANTI_ALIAS_FLAG);
                             paint.setColor(Color.BLUE);
-                            paint.setAlpha(5);
+                            paint.setAlpha(30);
                             canvas.drawRect(0,0,width,height, paint);
                             dragIv.setImageBitmap(bmp);
                         }
@@ -152,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                             Canvas canvas = new Canvas(bmp);
                             Paint paint = new Paint(ANTI_ALIAS_FLAG);
                             paint.setColor(Color.BLUE);
-                            paint.setAlpha(5);
+                            paint.setAlpha(30);
                             canvas.drawRect(0,0,width,height, paint);
                             dragIv.setImageBitmap(bmp);
                         }
@@ -163,6 +167,15 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case MotionEvent.ACTION_UP:
                         dragIv.setVisibility(View.INVISIBLE);
+                        selectList.clear();
+                        for(int i = 0; i < 100; i++){
+                            if(Iv[i].getVisibility() == View.VISIBLE && Iv[i].getX() > dragIv.getX() && Iv[i].getY() > dragIv.getY() && Iv[i].getX() + Iv[i].getWidth() < dragIv.getX() + width && Iv[i].getY() + Iv[i].getHeight() < dragIv.getY() + height){
+                                selectList.add(i);
+                            }
+                        }
+                        //for(int i = 0; i < selectList.size(); i++){
+                            //Iv[selectList.get(i)].setVisibility(View.INVISIBLE);
+                        //}
                         break;
                     default:
                         return false;
@@ -183,7 +196,6 @@ public class MainActivity extends AppCompatActivity {
                 fontswitch(position);
             }
         });
-
         et = (EditText) findViewById(R.id.edittext);
         et.addTextChangedListener(new TextWatcher() {
             @Override
@@ -205,21 +217,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public Bitmap TexttoBitmap(String text, float textSize, int textColor, Typeface tf) {
+    public Bitmap TexttoBitmap(String text, int index) {
         Paint paint = new Paint(ANTI_ALIAS_FLAG);
-        paint.setTextSize(textSize);
+        paint.setTextSize(iinfo[index].getTextSize());
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(textColor);
+        paint.setColor(iinfo[index].getTextColor());
         paint.setTextAlign(Paint.Align.LEFT);
-        paint.setTypeface(tf);
+        paint.setTypeface(tf[iinfo[index].getTfNum()]);
 
         Paint strokePaint = new Paint(ANTI_ALIAS_FLAG);
-        strokePaint.setTextSize(textSize);
-        strokePaint.setColor(Color.RED);
+        strokePaint.setTextSize(iinfo[index].getTextSize());
+        strokePaint.setColor(iinfo[index].getStrokeColor());
         strokePaint.setStyle(Paint.Style.STROKE);
         strokePaint.setTextAlign(Paint.Align.LEFT);
-        strokePaint.setTypeface(tf);
-        strokePaint.setStrokeWidth(10);
+        strokePaint.setTypeface(tf[iinfo[index].getTfNum()]);
+        strokePaint.setStrokeWidth(iinfo[index].getStrokeWidth());
 
         float baseline = -paint.ascent(); // ascent() is negative
         int width = (int) (paint.measureText(text) + 0.5f); // round
@@ -241,43 +253,64 @@ public class MainActivity extends AppCompatActivity {
         switch(position){
             case 0:
                 userfont = 0;
-                if(et.getText().toString().length()>0) {
+                if(et.getText().toString().length() > 0)
+                {
+                    for(int i = 0; i < selectList.size(); i++)
+                        iinfo[selectList.get(i)].setTfNum(userfont);
                     initIv(jamo());
                 }
                 break;
             case 1:
                 userfont = 1;
-                if(et.getText().toString().length()>0) {
+                if(et.getText().toString().length() > 0)
+                {
+                    for(int i = 0; i < selectList.size(); i++)
+                        iinfo[selectList.get(i)].setTfNum(userfont);
                     initIv(jamo());
                 }
                 break;
             case 2:
                 userfont = 2;
-                if(et.getText().toString().length()>0) {
+                if(et.getText().toString().length() > 0)
+                {
+                    for(int i = 0; i < selectList.size(); i++)
+                        iinfo[selectList.get(i)].setTfNum(userfont);
                     initIv(jamo());
                 }
                 break;
             case 3:
                 userfont = 3;
-                if(et.getText().toString().length()>0) {
+                if(et.getText().toString().length() > 0)
+                {
+                    for(int i = 0; i < selectList.size(); i++)
+                        iinfo[selectList.get(i)].setTfNum(userfont);
                     initIv(jamo());
                 }
                 break;
             case 4:
                 userfont = 4;
-                if(et.getText().toString().length()>0) {
+                if(et.getText().toString().length() > 0)
+                {
+                    for(int i = 0; i < selectList.size(); i++)
+                        iinfo[selectList.get(i)].setTfNum(userfont);
                     initIv(jamo());
                 }
                 break;
             case 5:
                 userfont = 5;
-                if(et.getText().toString().length()>0) {
+                if(et.getText().toString().length() > 0)
+                {
+                    for(int i = 0; i < selectList.size(); i++)
+                        iinfo[selectList.get(i)].setTfNum(userfont);
                     initIv(jamo());
                 }
                 break;
             case 6:
                 userfont = 6;
-                if(et.getText().toString().length()>0) {
+                if(et.getText().toString().length() > 0)
+                {
+                    for(int i = 0; i < selectList.size(); i++)
+                        iinfo[selectList.get(i)].setTfNum(userfont);
                     initIv(jamo());
                 }
                 break;
@@ -296,7 +329,12 @@ public class MainActivity extends AppCompatActivity {
     {
         userTextSize+=4;
         if(et.getText().toString().length() > 0)
+        {
+            for(int i = 0; i < selectList.size(); i++){
+                iinfo[selectList.get(i)].setTextSize(userTextSize);
+            }
             initIv(jamo());
+        }
     }
 
     public void fontsizedownClicked(View v)
@@ -304,7 +342,12 @@ public class MainActivity extends AppCompatActivity {
         if(userTextSize > 4)
             userTextSize-=4;
         if(et.getText().toString().length() > 0)
+        {
+            for(int i = 0; i < selectList.size(); i++){
+                iinfo[selectList.get(i)].setTextSize(userTextSize);
+            }
             initIv(jamo());
+        }
     }
 
     private static final char[] CHO =
@@ -363,12 +406,12 @@ public class MainActivity extends AppCompatActivity {
         lpfirst.addRule(RelativeLayout.CENTER_IN_PARENT, R.id.RL);
         lpfirst.addRule(RelativeLayout.ALIGN_PARENT_LEFT, R.id.RL);
 
-        Iv[0].setImageBitmap(TexttoBitmap(str.substring(0, 1), userTextSize, et.getCurrentTextColor(), tf[userfont]));
+        Iv[0].setImageBitmap(TexttoBitmap(str.substring(0, 1), 0));
         rl.addView(Iv[0], lpfirst);
         for(int i = 1; i < str.length(); i++)
         {
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-            Iv[i].setImageBitmap(TexttoBitmap(str.substring(i,i+1), userTextSize, et.getCurrentTextColor(), tf[userfont]));
+            Iv[i].setImageBitmap(TexttoBitmap(str.substring(i,i+1), i));
             lp.addRule(RelativeLayout.CENTER_IN_PARENT, R.id.RL);
             lp.addRule(RelativeLayout.RIGHT_OF, Iv[i - 1].getId());
             rl.addView(Iv[i], lp);
