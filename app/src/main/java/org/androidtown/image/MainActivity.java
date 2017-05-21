@@ -1,11 +1,14 @@
 package org.androidtown.image;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ListPopupWindow;
 import android.text.Editable;
@@ -18,11 +21,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 import static android.graphics.Bitmap.createBitmap;
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
+import static java.lang.System.out;
 
 public class MainActivity extends AppCompatActivity {
     public static int userfont = 0;
@@ -48,13 +57,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //define font
-        tf[0] = Typeface.createFromAsset(getAssets(), "NanumB.otf");
-        tf[1] = Typeface.createFromAsset(getAssets(), "NanumBarunGothic.ttf");
-        tf[2] = Typeface.createFromAsset(getAssets(), "NanumBarunGothicBold.ttf");
-        tf[3] = Typeface.createFromAsset(getAssets(), "NanumBarunpen.otf");
-        tf[4] = Typeface.createFromAsset(getAssets(), "Nanumhandbrush.ttf");
-        tf[5] = Typeface.createFromAsset(getAssets(), "NanumMyeongjo-YetHangul.otf");
-        tf[6] = Typeface.createFromAsset(getAssets(), "NanumPen.ttf");
+            tf[0] = Typeface.createFromAsset(getAssets(), "NanumB.otf");
+            tf[1] = Typeface.createFromAsset(getAssets(), "NanumBarunGothic.ttf");
+            tf[2] = Typeface.createFromAsset(getAssets(), "NanumBarunGothicBold.ttf");
+            tf[3] = Typeface.createFromAsset(getAssets(), "NanumBarunpen.otf");
+            tf[4] = Typeface.createFromAsset(getAssets(), "Nanumhandbrush.ttf");
+            tf[5] = Typeface.createFromAsset(getAssets(), "NanumMyeongjo-YetHangul.otf");
+            tf[6] = Typeface.createFromAsset(getAssets(), "NanumPen.ttf");
         //init user input value
         //init UI
         rl = (RelativeLayout) findViewById(R.id.RL);
@@ -348,6 +357,39 @@ public class MainActivity extends AppCompatActivity {
             }
             initIv(jamo());
         }
+    }
+
+    public void saveButtonClicked(View v)
+    {
+        File filepath = Environment.getExternalStorageDirectory();
+        rl.setDrawingCacheEnabled(true);
+        Bitmap bmp = rl.getDrawingCache();
+        SaveBitmapToFileCache(bmp, filepath.getAbsolutePath(), "abcd.jpg");
+    }
+
+    public  void SaveBitmapToFileCache(Bitmap bitmap, String strFilePath, String filename)
+    {
+        File file = new File(strFilePath);
+        // If no folders
+        if (!file.exists()) {
+        if(file.mkdirs() == false)
+            Toast.makeText(this, "failed mkdirs()", Toast.LENGTH_SHORT).show();
+        }
+        /*File fileCacheItem = new File(strFilePath + filename);
+        OutputStream out = null;
+        try {
+            fileCacheItem.createNewFile();
+            out = new FileOutputStream(fileCacheItem);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }*/
     }
 
     private static final char[] CHO =
