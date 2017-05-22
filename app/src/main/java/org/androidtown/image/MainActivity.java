@@ -64,15 +64,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<Integer> selectList = new ArrayList<Integer>();
     private IvInfo[] iinfo = new IvInfo[100];
     private ImageView Iv[] = new ImageView[100];
+    private DragView Dv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        checkPermission();
         screen = (LinearLayout)findViewById(R.id.Screen);
         btn_capture = (Button)findViewById(R.id.btn_Capture);
         btn_colorPicker = (Button)findViewById(R.id.btn_colorPicker);
         btn_colorPicker.setOnClickListener(this);
+        Dv = new DragView(this);
         //define font
             tf[0] = Typeface.createFromAsset(getAssets(), "NanumB.otf");
             tf[1] = Typeface.createFromAsset(getAssets(), "NanumBarunGothic.ttf");
@@ -84,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //init user input value
         //init UI
         rl = (RelativeLayout) findViewById(R.id.RL);
+        rl.addView(Dv);
+        Dv.setVisibility(View.INVISIBLE);
         for(i = 0; i < 100; i++){
             iinfo[i] = new IvInfo();
             Iv[i] = new ImageView(this);
@@ -120,15 +123,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dragIv = new ImageView(this);
         rl.addView(dragIv);
         dragIv.setVisibility(View.INVISIBLE);
+        dragIv.setAdjustViewBounds(true);
         btn_capture.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
+                checkPermission();
                 rl.setDrawingCacheEnabled(true);
                 Bitmap bm = rl.getDrawingCache();
                 saveScreenImage(bm);
             }
         });
-        rl.setOnTouchListener(new View.OnTouchListener() {
+        /*rl.setOnTouchListener(new View.OnTouchListener() {
             float x;
             float y;
             float width;
@@ -143,6 +149,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     case MotionEvent.ACTION_MOVE: {
                         if(x < ev.getX() && y < ev.getY()){
+                            if(bmp != null && !bmp.isRecycled()){
+                                bmp.recycle();
+                                bmp = null;
+                            }
                             dragIv.setVisibility(View.VISIBLE);
                             dragIv.setX(x); dragIv.setY(y);
                             width = ev.getX() - x;
@@ -156,6 +166,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             dragIv.setImageBitmap(bmp);
                         }
                         else if(x < ev.getX() && y > ev.getY()){
+                            if(bmp != null && !bmp.isRecycled()){
+                                bmp.recycle();
+                                bmp = null;
+                            }
                             dragIv.setVisibility(View.VISIBLE);
                             dragIv.setX(x); dragIv.setY(ev.getY());
                             width = ev.getX() - x;
@@ -169,6 +183,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             dragIv.setImageBitmap(bmp);
                         }
                         else if(x > ev.getX() && y > ev.getY()){
+                            if(bmp != null && !bmp.isRecycled()){
+                                bmp.recycle();
+                                bmp = null;
+                            }
                             dragIv.setVisibility(View.VISIBLE);
                             dragIv.setX(ev.getX()); dragIv.setY(ev.getY());
                             width = x - ev.getX();
@@ -182,6 +200,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             dragIv.setImageBitmap(bmp);
                         }
                         else if(x > ev.getX() && y < ev.getY()){
+                            if(bmp != null && !bmp.isRecycled()){
+                                bmp.recycle();
+                                bmp = null;
+                            }
                             dragIv.setVisibility(View.VISIBLE);
                             dragIv.setX(ev.getX()); dragIv.setY(y);
                             width = x - ev.getX();
@@ -207,9 +229,67 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 selectList.add(i);
                             }
                         }
-                        //for(int i = 0; i < selectList.size(); i++){
-                            //Iv[selectList.get(i)].setVisibility(View.INVISIBLE);
-                        //}
+                        break;
+                    default:
+                        return false;
+                }
+                return true;
+            }
+        });*/
+        rl.setOnTouchListener(new View.OnTouchListener(){
+            float x, y;
+            float width, height;
+            public boolean onTouch(View v, MotionEvent ev){
+                switch (ev.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        x = ev.getX();
+                        y = ev.getY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        if(x < ev.getX() && y < ev.getY()){
+                            Dv.setVisibility(View.INVISIBLE);
+                            Dv.setX(x); Dv.setY(y);
+                            width = ev.getX() - x;
+                            height = ev.getY() - y;
+                            Dv.setWidth((int)width); Dv.setHeight((int)height);
+                            Dv.setVisibility(View.VISIBLE);
+                        }
+                        else if(x < ev.getX() && y > ev.getY()){
+                            Dv.setVisibility(View.INVISIBLE);
+                            Dv.setX(x); Dv.setY(ev.getY());
+                            width = ev.getX() - x;
+                            height = y - ev.getY();
+                            Dv.setWidth((int)width); Dv.setHeight((int)height);
+                            Dv.setVisibility(View.VISIBLE);
+                        }
+                        else if(x > ev.getX() && y > ev.getY()){
+                            Dv.setVisibility(View.INVISIBLE);
+                            Dv.setX(ev.getX()); Dv.setY(ev.getY());
+                            width = x - ev.getX();
+                            height = y - ev.getY();
+                            Dv.setWidth((int)width); Dv.setHeight((int)height);
+                            Dv.setVisibility(View.VISIBLE);
+                        }
+                        else if(x > ev.getX() && y < ev.getY()){
+                            Dv.setVisibility(View.INVISIBLE);
+                            Dv.setX(ev.getX()); Dv.setY(y);
+                            width = x - ev.getX();
+                            height = ev.getY() - y;
+                            Dv.setWidth((int)width); Dv.setHeight((int)height);
+                            Dv.setVisibility(View.VISIBLE);
+                        }
+                        break;
+                    case MotionEvent.ACTION_CANCEL:
+                        Dv.setVisibility(View.INVISIBLE);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        Dv.setVisibility(View.INVISIBLE);
+                        selectList.clear();
+                        for(int i = 0; i < 100; i++){
+                            if(Iv[i].getVisibility() == View.VISIBLE && Iv[i].getX() > Dv.getX() && Iv[i].getY() > Dv.getY() && Iv[i].getX() + Iv[i].getWidth() < Dv.getX() + width && Iv[i].getY() + Iv[i].getHeight() < Dv.getY() + height){
+                                selectList.add(i);
+                            }
+                        }
                         break;
                     default:
                         return false;
@@ -384,39 +464,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void saveButtonClicked(View v)
-    {
-        File filepath = Environment.getExternalStorageDirectory();
-        rl.setDrawingCacheEnabled(true);
-        Bitmap bmp = rl.getDrawingCache();
-        SaveBitmapToFileCache(bmp, filepath.getAbsolutePath(), "abcd.jpg");
-    }
-
-    public  void SaveBitmapToFileCache(Bitmap bitmap, String strFilePath, String filename)
-    {
-        File file = new File(strFilePath);
-        // If no folders
-        if (!file.exists()) {
-        if(file.mkdirs() == false)
-            Toast.makeText(this, "failed mkdirs()", Toast.LENGTH_SHORT).show();
-        }
-        /*File fileCacheItem = new File(strFilePath + filename);
-        OutputStream out = null;
-        try {
-            fileCacheItem.createNewFile();
-            out = new FileOutputStream(fileCacheItem);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }*/
-    }
-
     private static final char[] CHO =
 		/*ㄱ ㄲ ㄴ ㄷ ㄸ ㄹ ㅁ ㅂ ㅃ ㅅ ㅆ ㅇ ㅈ ㅉ ㅊ ㅋ ㅌ ㅍ ㅎ */
             {0x3131, 0x3132, 0x3134, 0x3137, 0x3138, 0x3139, 0x3141, 0x3142, 0x3143, 0x3145,
@@ -504,7 +551,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             initIv(jamo());
         }
     }
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkPermission() {
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -561,7 +607,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void saveScreenImage(Bitmap bm){
         FileOutputStream stream;
-        String path = "/mnt/sdcard/DCIM/Camera/" + "a.png";
+        String path = "/mnt/sdcard/DCIM/" + "a.png";
         try{
             stream = new FileOutputStream(path);
             bm.compress(Bitmap.CompressFormat.PNG, 90,stream);
