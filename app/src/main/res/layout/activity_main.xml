@@ -4,6 +4,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:id="@+id/Screen"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -13,7 +14,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="5">
+            android:layout_weight="5"
+            >
 
             <ListView
                 android:layout_width="match_parent"
@@ -29,6 +31,19 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="색상선택"
+                android:id="@+id/btn_colorPicker"
+                android:layout_alignParentTop="true"
+                android:layout_toStartOf="@+id/button" />
+            <Button
+                android:id="@+id/btn_Capture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="screenshot"
+                android:text="Capture" />
         </RelativeLayout>
 
         <RelativeLayout

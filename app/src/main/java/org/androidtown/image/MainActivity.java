@@ -1,18 +1,23 @@
 package org.androidtown.image;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ListPopupWindow;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,26 +25,33 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 import static android.graphics.Bitmap.createBitmap;
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
-import static java.lang.System.out;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, ColorPickerDialog.OnColorChangedListener{
+    private static final int MY_PERMISSION_REQUEST_STORAGE = 100;
+    private static final String TAG = "AppPermission";
     public static int userfont = 0;
     public static float userTextSize = 80;
     public static int userTextColor = Color.BLACK;
     public static int userStrokeWidth = 10;
     public static int userStrokeColor = Color.RED;
     //
+
+    Button btn_colorPicker;
+    int color;
+    Button btn_capture;
+    LinearLayout screen = null;
     private EditText et;
     private ImageView dragIv;
     private Typeface[] tf = new Typeface[7];
@@ -56,6 +68,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        checkPermission();
+        screen = (LinearLayout)findViewById(R.id.Screen);
+        btn_capture = (Button)findViewById(R.id.btn_Capture);
+        btn_colorPicker = (Button)findViewById(R.id.btn_colorPicker);
+        btn_colorPicker.setOnClickListener(this);
         //define font
             tf[0] = Typeface.createFromAsset(getAssets(), "NanumB.otf");
             tf[1] = Typeface.createFromAsset(getAssets(), "NanumBarunGothic.ttf");
@@ -103,6 +120,14 @@ public class MainActivity extends AppCompatActivity {
         dragIv = new ImageView(this);
         rl.addView(dragIv);
         dragIv.setVisibility(View.INVISIBLE);
+        btn_capture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rl.setDrawingCacheEnabled(true);
+                Bitmap bm = rl.getDrawingCache();
+                saveScreenImage(bm);
+            }
+        });
         rl.setOnTouchListener(new View.OnTouchListener() {
             float x;
             float y;
@@ -460,6 +485,89 @@ public class MainActivity extends AppCompatActivity {
         }
         for(int i = str.length(); i < 100; i++)
             rl.addView(Iv[i]);
+    }
+
+    @Override
+    public void onClick(View v) {
+        color = PreferenceManager.getDefaultSharedPreferences(this).getInt("color", Color.WHITE);
+        new ColorPickerDialog(this, this, color).show();
+    }
+
+    @Override
+    public void colorChanged(int color) {
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putInt("color", color).commit();
+        userTextColor = color;
+        if(et.getText().toString().length() > 0) {
+            for (int i = 0; i < selectList.size(); i++) {
+                iinfo[selectList.get(i)].setTextColor(userTextColor);
+            }
+            initIv(jamo());
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void checkPermission() {
+        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // Explain to the user why we need to write the permission.
+                Toast.makeText(this, "Read/Write external storage", Toast.LENGTH_SHORT).show();
+            }
+
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSION_REQUEST_STORAGE);
+
+            // MY_PERMISSION_REQUEST_STORAGE is an
+            // app-defined int constant
+
+        } else {
+            // 다음 부분은 항상 허용일 경우에 해당이 됩니다.
+            writeFile();
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSION_REQUEST_STORAGE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+
+                    writeFile();
+
+                    // permission was granted, yay! do the
+                    // calendar task you need to do.
+
+                } else {
+
+                    Log.d(TAG, "Permission always deny");
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                break;
+        }
+    }
+    private void writeFile() {
+        File file = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "temp.txt");
+        try {
+            Log.d(TAG, "create new File : " + file.createNewFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void saveScreenImage(Bitmap bm){
+        FileOutputStream stream;
+        String path = "/mnt/sdcard/DCIM/Camera/" + "a.png";
+        try{
+            stream = new FileOutputStream(path);
+            bm.compress(Bitmap.CompressFormat.PNG, 90,stream);
+        }catch(FileNotFoundException e){
+            e.printStackTrace();
+        }
     }
 }
 
