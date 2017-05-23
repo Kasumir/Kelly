@@ -30,8 +30,6 @@
                 android:adjustViewBounds="true"
                 android:onClick="onfusionclick"
                 android:background="@drawable/image5"
-                android:maxHeight="80dp"
-                android:maxWidth="73dp"
                 android:scaleType="fitXY" />
         </LinearLayout>
 

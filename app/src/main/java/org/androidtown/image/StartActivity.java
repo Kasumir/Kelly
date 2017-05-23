@@ -18,6 +18,8 @@ public class StartActivity extends AppCompatActivity {
     }
 
     public void onfusionclick(View v){
-
+        Intent intent = new Intent(getApplicationContext(), HeeActivity.class);
+        startActivity(intent);
     }
+
 }
