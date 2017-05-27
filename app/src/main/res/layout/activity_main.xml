@@ -37,21 +37,33 @@
                 android:layout_height="60dp"
                 android:onClick="onbtnClicked"
                 android:background="@drawable/font"
+                android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:layout_alignBottom="@+id/btn_colorPicker" />
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="색상선택"
                 android:id="@+id/btn_colorPicker"
-                android:layout_alignParentTop="true"
-                android:layout_toStartOf="@+id/button" />
-            <Button
-                android:id="@+id/btn_Capture"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="screenshot"
-                android:text="Capture" />
+                android:layout_alignParentTop="true"
+                android:layout_toStartOf="@+id/button"
+                android:text="color" />
+
+            <Button
+                android:id="@+id/polygonButton"
+                android:layout_width="100dp"
+                android:layout_height="60dp"
+                android:layout_alignParentTop="true"
+                android:layout_toStartOf="@+id/btn_colorPicker"
+                android:background="@drawable/polygon" />
+
+            <Button
+                android:id="@+id/button3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toStartOf="@+id/polygonButton"
+                android:onClick="onSeperateBtnClicked"
+                android:text="쪼개기" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -70,15 +82,13 @@
         android:layout_weight="5">
 
         <Button
-            android:id="@+id/save"
+            android:id="@+id/btn_Capture"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="37dp"
-            android:layout_weight="5"
-            android:onClick="saveButtonClicked"
-            android:text="save" />
+            android:onClick="screenshot"
+            android:text="Capture"
+            android:layout_below="@+id/edittext"
+            android:layout_alignParentStart="true" />
 
         <EditText
             android:id="@+id/edittext"
