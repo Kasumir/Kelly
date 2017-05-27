@@ -20,8 +20,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -52,18 +50,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static int userStrokeColor = Color.RED;
     private String text = "";
     //
-    int click_number;
+
     Button btn_colorPicker;
     int color;
-    Button btn_capture, mbtn_outline;
+    Button btn_capture;
     LinearLayout screen = null;
     public static EditText et;
     private Typeface[] tf = new Typeface[7];
-    private Button btn;
-    private ListPopupWindow list, outline_list;
+    private Button btn, btn_line;
+    private ListPopupWindow list, line_list;
     private RelativeLayout rl;
     private String[] font = {"나눔", "나눔바른고딕", "나눔바른고딕볼드", "나눔바른펜", "나눔핸드브러시","나눔명조-옛한글", "나눔펜"};
-    private String[] str_line = {"굵기", "색상"};
+    private String[] str_line = {"굵기", "색깔"};
     private int ivFocus;
     private int i;
     private ArrayList<Integer> selectList = new ArrayList<Integer>();
@@ -215,20 +213,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return true;
             }
         });
-
-        mbtn_outline = (Button)findViewById(R.id.btn_outline);
-        outline_list = new ListPopupWindow(this);
-        outline_list.setWidth(300);
-        outline_list.setHeight(300);
-        outline_list.setAnchorView(mbtn_outline);
-        outline_list.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, str_line));
-        outline_list.setModal(true);
-        outline_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-
-            }
-        });
         btn = (Button) findViewById(R.id.button);
         list = new ListPopupWindow(this);
         list.setWidth(300);
@@ -242,7 +226,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 fontswitch(position);
             }
         });
+        btn_line = (Button)findViewById(R.id.btn_outline);
+        line_list = new ListPopupWindow(this);
+        line_list.setWidth(300);
+        line_list.setHeight(300);
+        line_list.setAnchorView(btn_line);
+        line_list.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, str_line));
+        line_list.setModal(true);
+        line_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
 
+            }
+        });
         et = (EditText) findViewById(R.id.edittext);
         et.addTextChangedListener(new TextWatcher() {
             @Override
@@ -374,11 +370,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void onbtnClicked2(View v)
     {
-        if(outline_list.isShowing())
-            outline_list.dismiss();
+        if(line_list.isShowing())
+            line_list.dismiss();
         else
-            outline_list.show();
-
+            line_list.show();
     }
 
     public void fontsizeupClicked(View v)
