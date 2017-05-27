@@ -35,8 +35,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static android.app.PendingIntent.getActivity;
 import static android.graphics.Bitmap.createBitmap;
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
+import static android.os.Parcelable.CONTENTS_FILE_DESCRIPTOR;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, ColorPickerDialog.OnColorChangedListener{
     private static final int MY_PERMISSION_REQUEST_STORAGE = 100;
@@ -46,14 +48,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static int userTextColor = Color.BLACK;
     public static int userStrokeWidth = 10;
     public static int userStrokeColor = Color.RED;
+    private String text = "";
     //
 
     Button btn_colorPicker;
     int color;
     Button btn_capture;
     LinearLayout screen = null;
-    private EditText et;
-    private ImageView dragIv;
+    public static EditText et;
     private Typeface[] tf = new Typeface[7];
     private Button btn;
     private ListPopupWindow list;
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private IvInfo[] iinfo = new IvInfo[100];
     private ImageView Iv[] = new ImageView[100];
     private DragView Dv;
+    private ScreenString str = new ScreenString();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,9 +102,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 public boolean onTouch(View v, MotionEvent ev){
                     switch (ev.getAction()) {
                         case MotionEvent.ACTION_DOWN: {
+                            selectList.clear();
+                            selectList.add(v.getId() - 1);
+                            for(int i = 0; i < 100; i++){
+                                Iv[i].setBackgroundColor(Color.TRANSPARENT);
+                                Iv[i].setAlpha((float)1);
+                            }
+                            for(int i = 0; i < selectList.size();i++){
+                                Iv[selectList.get(i)].setBackgroundColor(Color.CYAN);
+                                Iv[selectList.get(i)].setAlpha((float)0.5);
+                            }
                             x = v.getX() - ev.getRawX(); // 손으로누른좌표랑 이미지왼쪽위좌표값의 차이값
                             y = v.getY() - ev.getRawY();
                             ivFocus = v.getId() - 1;
+                            int j = ivFocus;
+                            for (int k = 0; k < str.divIndexList.size(); k++) {
+                                if (str.divIndexList.get(k) < j) {
+                                    char ch = str.before.charAt(str.divIndexList.get(k));
+                                    if (ch >= 0xAC00 && ch <= 0xD7A3) //한글이고 분해목록에 있으면
+                                    {
+                                        int a, b, c;
+                                        c = ch - 0xAC00;
+                                        a = c / (21 * 28);
+                                        c = c % (21 * 28);
+                                        b = c / 28;
+                                        c = c % 28;
+                                        if (c == 0)
+                                            j -= 1;
+                                        else {
+                                            if (str.divIndexList.get(k) + 1 == j)
+                                                j -= 1;
+                                            else
+                                                j -= 2;
+                                        }
+                                    }
+                                }
+                            }
+                            Toast.makeText(MainActivity.this, "" + j, Toast.LENGTH_SHORT).show();
                             break;
                         }
                         case MotionEvent.ACTION_MOVE: {
@@ -120,10 +157,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
         }
-        dragIv = new ImageView(this);
-        rl.addView(dragIv);
-        dragIv.setVisibility(View.INVISIBLE);
-        dragIv.setAdjustViewBounds(true);
         btn_capture.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
@@ -188,6 +221,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 selectList.add(i);
                             }
                         }
+                        for(int i = 0; i < 100; i++){
+                            Iv[i].setBackgroundColor(Color.TRANSPARENT);
+                            Iv[i].setAlpha((float)1);
+                        }
+                        for(int i = 0; i < selectList.size();i++){
+                            Iv[selectList.get(i)].setBackgroundColor(Color.CYAN);
+                            Iv[selectList.get(i)].setAlpha((float)0.5);
+                        }
                         break;
                     default:
                         return false;
@@ -217,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(et.getText().toString().length()>0)
-                    initIv(jamo());
+                    initIv(str.setText());
                 else
                     for(int i = 0; i < 100; i++)
                         Iv[i].setVisibility(View.INVISIBLE);
@@ -245,9 +286,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         strokePaint.setTypeface(tf[iinfo[index].getTfNum()]);
         strokePaint.setStrokeWidth(iinfo[index].getStrokeWidth());
 
-        float baseline = -paint.ascent(); // ascent() is negative
-        int width = (int) (paint.measureText(text) + 0.5f); // round
-        int height = (int) (baseline + paint.descent() + 0.5f);
+        float baseline = -strokePaint.ascent(); // ascent() is negative
+        int width = (int) (strokePaint.measureText(text) + 0.5f) + userStrokeWidth; // round
+        int height = (int) (baseline + strokePaint.descent() + 0.5f) + userStrokeWidth;
 
         Bitmap image = createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
@@ -269,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 {
                     for(int i = 0; i < selectList.size(); i++)
                         iinfo[selectList.get(i)].setTfNum(userfont);
-                    initIv(jamo());
+                    initIv(str.setText());
                 }
                 break;
             case 1:
@@ -278,7 +319,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 {
                     for(int i = 0; i < selectList.size(); i++)
                         iinfo[selectList.get(i)].setTfNum(userfont);
-                    initIv(jamo());
+                    initIv(str.setText());
                 }
                 break;
             case 2:
@@ -287,7 +328,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 {
                     for(int i = 0; i < selectList.size(); i++)
                         iinfo[selectList.get(i)].setTfNum(userfont);
-                    initIv(jamo());
+                    initIv(str.setText());
                 }
                 break;
             case 3:
@@ -296,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 {
                     for(int i = 0; i < selectList.size(); i++)
                         iinfo[selectList.get(i)].setTfNum(userfont);
-                    initIv(jamo());
+                    initIv(str.setText());
                 }
                 break;
             case 4:
@@ -305,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 {
                     for(int i = 0; i < selectList.size(); i++)
                         iinfo[selectList.get(i)].setTfNum(userfont);
-                    initIv(jamo());
+                    initIv(str.setText());
                 }
                 break;
             case 5:
@@ -314,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 {
                     for(int i = 0; i < selectList.size(); i++)
                         iinfo[selectList.get(i)].setTfNum(userfont);
-                    initIv(jamo());
+                    initIv(str.setText());
                 }
                 break;
             case 6:
@@ -323,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 {
                     for(int i = 0; i < selectList.size(); i++)
                         iinfo[selectList.get(i)].setTfNum(userfont);
-                    initIv(jamo());
+                    initIv(str.setText());
                 }
                 break;
         }
@@ -343,9 +384,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(et.getText().toString().length() > 0)
         {
             for(int i = 0; i < selectList.size(); i++){
-                iinfo[selectList.get(i)].setTextSize(userTextSize);
+                iinfo[selectList.get(i)].setTextSize(iinfo[selectList.get(i)].getTextSize() + 4);
             }
-            initIv(jamo());
+            initIv(str.setText());
         }
     }
 
@@ -356,9 +397,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(et.getText().toString().length() > 0)
         {
             for(int i = 0; i < selectList.size(); i++){
-                iinfo[selectList.get(i)].setTextSize(userTextSize);
+                iinfo[selectList.get(i)].setTextSize(iinfo[selectList.get(i)].getTextSize() - 4);
             }
-            initIv(jamo());
+            initIv(str.setText());
+        }
+    }
+
+    public void onSeperateBtnClicked(View v){
+        if(et.getText().toString().length() > 0) {
+            for (int i = 0; i < selectList.size(); i++) {
+                int j = selectList.get(i);
+                for (int k = 0; k < str.divIndexList.size(); k++) {
+                    if (str.divIndexList.get(k) < j) {
+                        char ch = str.before.charAt(str.divIndexList.get(k));
+                        if (ch >= 0xAC00 && ch <= 0xD7A3) //한글이고 분해목록에 있으면
+                        {
+                            int a, b, c;
+                            c = ch - 0xAC00;
+                            a = c / (21 * 28);
+                            c = c % (21 * 28);
+                            b = c / 28;
+                            c = c % 28;
+                            if (c == 0)
+                                j -= 1;
+                            else {
+                                if (str.divIndexList.get(k) + 1 == j)
+                                    j -= 1;
+                                else
+                                    j -= 2;
+                            }
+                        }
+                    }
+                }
+                Toast.makeText(this, "" + j, Toast.LENGTH_SHORT).show();
+                if (str.check(j))
+                    str.remove(j);
+                else
+                    str.add(j);
+            }
+            initIv(str.setText());
         }
     }
 
