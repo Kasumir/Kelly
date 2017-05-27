@@ -115,30 +115,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             x = v.getX() - ev.getRawX(); // 손으로누른좌표랑 이미지왼쪽위좌표값의 차이값
                             y = v.getY() - ev.getRawY();
                             ivFocus = v.getId() - 1;
-                            int j = ivFocus;
-                            for (int k = 0; k < str.divIndexList.size(); k++) {
-                                if (str.divIndexList.get(k) < j) {
-                                    char ch = str.before.charAt(str.divIndexList.get(k));
-                                    if (ch >= 0xAC00 && ch <= 0xD7A3) //한글이고 분해목록에 있으면
-                                    {
-                                        int a, b, c;
-                                        c = ch - 0xAC00;
-                                        a = c / (21 * 28);
-                                        c = c % (21 * 28);
-                                        b = c / 28;
-                                        c = c % 28;
-                                        if (c == 0)
-                                            j -= 1;
-                                        else {
-                                            if (str.divIndexList.get(k) + 1 == j)
-                                                j -= 1;
-                                            else
-                                                j -= 2;
-                                        }
-                                    }
-                                }
-                            }
-                            Toast.makeText(MainActivity.this, "" + j, Toast.LENGTH_SHORT).show();
                             break;
                         }
                         case MotionEvent.ACTION_MOVE: {
@@ -429,7 +405,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 }
-                Toast.makeText(this, "" + j, Toast.LENGTH_SHORT).show();
                 if (str.check(j))
                     str.remove(j);
                 else
