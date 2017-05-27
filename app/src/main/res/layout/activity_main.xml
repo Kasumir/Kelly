@@ -23,14 +23,22 @@
                 android:layout_centerVertical="true" />
 
             <Button
+                android:id="@+id/btn_outline"
+                android:layout_width="100dp"
+                android:layout_height="60dp"
+                android:onClick="onbtnClicked2"
+                android:text="테두리"
+                android:layout_alignParentTop="true"
+                android:layout_toStartOf="@+id/btn_colorPicker"
+                android:layout_alignBottom="@+id/btn_colorPicker" />
+            <Button
                 android:id="@+id/button"
                 android:layout_width="100dp"
                 android:layout_height="60dp"
                 android:onClick="onbtnClicked"
                 android:background="@drawable/font"
-                android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
-                />
+                android:layout_alignBottom="@+id/btn_colorPicker" />
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
