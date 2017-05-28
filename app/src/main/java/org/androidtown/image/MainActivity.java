@@ -24,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Typeface[] tf = new Typeface[7];
     private Button btn, btn_line;
     private ListPopupWindow list, line_list;
-    private RelativeLayout rl;
+    private RelativeLayout rl, r2;
     private String[] font = {"나눔", "나눔바른고딕", "나눔바른고딕볼드", "나눔바른펜", "나눔핸드브러시","나눔명조-옛한글", "나눔펜"};
     private String[] str_line = {"굵기", "색깔"};
     private int ivFocus;
@@ -73,6 +74,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        HorizontalScrollView hv = (HorizontalScrollView)findViewById(R.id.scroll);
+        r2 = (RelativeLayout)findViewById(R.id.layout_in_scroll);
+        hv.setHorizontalScrollBarEnabled(true);
         screen = (LinearLayout)findViewById(R.id.Screen);
         btn_capture = (Button)findViewById(R.id.btn_Capture);
         btn_colorPicker = (Button)findViewById(R.id.btn_colorPicker);
