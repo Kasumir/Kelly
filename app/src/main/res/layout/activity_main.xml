@@ -28,9 +28,9 @@
                 android:layout_height="60dp"
                 android:onClick="onbtnClicked2"
                 android:text="테두리"
-                android:layout_alignParentTop="true"
-                android:layout_toStartOf="@+id/btn_colorPicker"
-                android:layout_alignBottom="@+id/btn_colorPicker" />
+                android:layout_alignParentBottom="true"
+                android:layout_toEndOf="@+id/btn_colorPicker"
+                android:layout_marginStart="10dp" />
             <Button
                 android:id="@+id/button"
                 android:layout_width="100dp"
@@ -54,7 +54,8 @@
                 android:layout_height="60dp"
                 android:layout_alignParentTop="true"
                 android:layout_toStartOf="@+id/btn_colorPicker"
-                android:background="@drawable/polygon" />
+                android:background="@drawable/polygon"
+                android:onClick="onPolygonBtnClicked" />
 
             <Button
                 android:id="@+id/button3"
