@@ -47,28 +47,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static int userfont = 0;
     public static float userTextSize = 80;
     public static int userTextColor = Color.BLACK;
-    public static int userStrokeWidth = 10;
+    public static int userStrokeWidth = 0;
     public static int userStrokeColor = Color.RED;
-    private String text = "";
+    public static int userPolygon = -1;
+    public static boolean userUnderline = false;
+    public static float userSkew= 0;
+    public static int click = 0;
     //
 
     Button btn_colorPicker;
+    Button btn_Outline;
     int color;
     Button btn_capture;
     LinearLayout screen = null;
     public static EditText et;
     private Typeface[] tf = new Typeface[7];
-    private Button btn, btn_line;
-    private ListPopupWindow list, line_list;
-    private RelativeLayout rl, r2;
+    private Button btn, btn_line, btn_polygon;
+    private ListPopupWindow list, line_list, polygon_list;
+    private RelativeLayout rl;
     private String[] font = {"나눔", "나눔바른고딕", "나눔바른고딕볼드", "나눔바른펜", "나눔핸드브러시","나눔명조-옛한글", "나눔펜"};
     private String[] str_line = {"굵기", "색깔"};
+    private String[] str_polygon = {"사각형", "원", "지우기"};
     private int ivFocus;
     private int i;
-    private ArrayList<Integer> selectList = new ArrayList<Integer>();
+    private ArrayList<Integer> selectList = new ArrayList<>();
+    private ArrayList<Polygon> polygonArrayList = new ArrayList<>();
+    private ArrayList<Polygon> selectPolygonArrayList = new ArrayList<>();
     private IvInfo[] iinfo = new IvInfo[100];
     private ImageView Iv[] = new ImageView[100];
     private DragView Dv;
+    private Polygon poly;
     private ScreenString str = new ScreenString();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         case MotionEvent.ACTION_DOWN: {
                             selectList.clear();
                             selectList.add(v.getId() - 1);
+                            selectPolygonArrayList.clear();
                             for(int i = 0; i < 100; i++){
                                 Iv[i].setBackgroundColor(Color.TRANSPARENT);
                                 Iv[i].setAlpha((float)1);
@@ -116,6 +125,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             for(int i = 0; i < selectList.size();i++){
                                 Iv[selectList.get(i)].setBackgroundColor(Color.CYAN);
                                 Iv[selectList.get(i)].setAlpha((float)0.5);
+                            }
+                            for(int i = 0; i < polygonArrayList.size();i++){
+                                polygonArrayList.get(i).setBackgroundColor(Color.TRANSPARENT);
+                                polygonArrayList.get(i).setAlpha((float)1);
                             }
                             x = v.getX() - ev.getRawX(); // 손으로누른좌표랑 이미지왼쪽위좌표값의 차이값
                             y = v.getY() - ev.getRawY();
@@ -156,60 +169,191 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     case MotionEvent.ACTION_DOWN:
                         x = ev.getX();
                         y = ev.getY();
+                        if(userPolygon == 0 || userPolygon == 1){
+                            poly = new Polygon(MainActivity.this);
+                            polygonArrayList.add(poly);
+                            poly.setOnTouchListener(new View.OnTouchListener() {
+                                float x;
+                                float y;
+                                public boolean onTouch(View v, MotionEvent ev){
+                                    switch (ev.getAction()) {
+                                        case MotionEvent.ACTION_DOWN: {
+                                            if(userPolygon == 2){
+                                                v.setVisibility(View.INVISIBLE);
+                                                userPolygon = -1;
+                                            }
+                                            else {
+                                                x = v.getX() - ev.getRawX(); // 손으로누른좌표랑 이미지왼쪽위좌표값의 차이값
+                                                y = v.getY() - ev.getRawY();
+                                                selectPolygonArrayList.clear();
+                                                selectPolygonArrayList.add((Polygon)v);
+                                                for(int i = 0; i < polygonArrayList.size(); i++){
+                                                    polygonArrayList.get(i).setBackgroundColor(Color.TRANSPARENT);
+                                                    polygonArrayList.get(i).setAlpha((float)1);
+                                                }
+                                                for(int i = 0; i < selectPolygonArrayList.size(); i++){
+                                                    selectPolygonArrayList.get(i).setBackgroundColor(Color.CYAN);
+                                                    selectPolygonArrayList.get(i).setAlpha((float)0.5);
+                                                }
+                                                for(int i = 0; i < 100; i++){
+                                                    Iv[i].setBackgroundColor(Color.TRANSPARENT);
+                                                    Iv[i].setAlpha((float)1);
+                                                }
+                                            }
+                                            break;
+                                        }
+                                        case MotionEvent.ACTION_MOVE: {
+                                            v.animate().x(ev.getRawX() + x).y(ev.getRawY() + y).setDuration(0).start(); // 이동시켜주는함수.
+                                        }
+                                        break;
+                                        case MotionEvent.ACTION_CANCEL: //터치모션 캔슬되었을 때. 아무것도안함.
+                                        case MotionEvent.ACTION_UP: // 손가락뗏을때. 아무것도안함.
+                                            break;
+                                        default:
+                                            return false;
+                                    }
+                                    return true;
+                                }
+                            });
+                            rl.addView(poly);
+                        }
                         break;
                     case MotionEvent.ACTION_MOVE:
                         if(x < ev.getX() && y < ev.getY()){
-                            Dv.setVisibility(View.INVISIBLE);
-                            Dv.setX(x); Dv.setY(y);
+
                             width = ev.getX() - x;
                             height = ev.getY() - y;
-                            Dv.setWidth((int)width); Dv.setHeight((int)height);
-                            Dv.setVisibility(View.VISIBLE);
+                            if(userPolygon == 0){
+                                poly.setVisibility(View.INVISIBLE);
+                                poly.setX(x); poly.setY(y);
+                                poly.setWidth((int)width); poly.setHeight((int)height);
+                                poly.setColor(userTextColor);
+                                poly.setShape(poly.RECT);
+                                poly.setVisibility(View.VISIBLE);
+                            }else if(userPolygon == 1){
+                                poly.setVisibility(View.INVISIBLE);
+                                poly.setX(x); poly.setY(y);
+                                poly.setWidth((int)width); poly.setHeight((int)height);
+                                poly.setColor(userTextColor);
+                                poly.setShape(poly.ROUND);
+                                poly.setVisibility(View.VISIBLE);
+                            }else if(userPolygon != 0 && userPolygon != 1){
+                                Dv.setVisibility(View.INVISIBLE);
+                                Dv.setX(x); Dv.setY(y);
+                                Dv.setWidth((int)width); Dv.setHeight((int)height);
+                                Dv.setVisibility(View.VISIBLE);
+                            }
                         }
                         else if(x < ev.getX() && y > ev.getY()){
-                            Dv.setVisibility(View.INVISIBLE);
-                            Dv.setX(x); Dv.setY(ev.getY());
                             width = ev.getX() - x;
                             height = y - ev.getY();
-                            Dv.setWidth((int)width); Dv.setHeight((int)height);
-                            Dv.setVisibility(View.VISIBLE);
+                            if(userPolygon == 0){
+                                poly.setVisibility(View.INVISIBLE);
+                                poly.setX(x); poly.setY(ev.getY());
+                                poly.setWidth((int)width); poly.setHeight((int)height);
+                                poly.setColor(userTextColor);
+                                poly.setShape(poly.RECT);
+                                poly.setVisibility(View.VISIBLE);
+                            }else if(userPolygon == 1){
+                                poly.setVisibility(View.INVISIBLE);
+                                poly.setX(x); poly.setY(ev.getY());
+                                poly.setWidth((int)width); poly.setHeight((int)height);
+                                poly.setColor(userTextColor);
+                                poly.setShape(poly.ROUND);
+                                poly.setVisibility(View.VISIBLE);
+                            }else if(userPolygon != 0 && userPolygon != 1) {
+                                Dv.setVisibility(View.INVISIBLE);
+                                Dv.setX(x);Dv.setY(ev.getY());
+                                Dv.setWidth((int) width);Dv.setHeight((int) height);
+                                Dv.setVisibility(View.VISIBLE);
+                            }
                         }
                         else if(x > ev.getX() && y > ev.getY()){
-                            Dv.setVisibility(View.INVISIBLE);
-                            Dv.setX(ev.getX()); Dv.setY(ev.getY());
                             width = x - ev.getX();
                             height = y - ev.getY();
-                            Dv.setWidth((int)width); Dv.setHeight((int)height);
-                            Dv.setVisibility(View.VISIBLE);
+                            if(userPolygon == 0){
+                                poly.setVisibility(View.INVISIBLE);
+                                poly.setX(ev.getX()); poly.setY(ev.getY());
+                                poly.setWidth((int)width); poly.setHeight((int)height);
+                                poly.setColor(userTextColor);
+                                poly.setShape(poly.RECT);
+                                poly.setVisibility(View.VISIBLE);
+                            }else if(userPolygon == 1){
+                                poly.setVisibility(View.INVISIBLE);
+                                poly.setX(ev.getX()); poly.setY(ev.getY());
+                                poly.setWidth((int)width); poly.setHeight((int)height);
+                                poly.setColor(userTextColor);
+                                poly.setShape(poly.ROUND);
+                                poly.setVisibility(View.VISIBLE);
+                            }else if(userPolygon != 0 && userPolygon != 1) {
+                                Dv.setVisibility(View.INVISIBLE);
+                                Dv.setX(ev.getX());Dv.setY(ev.getY());
+                                Dv.setWidth((int) width);Dv.setHeight((int) height);
+                                Dv.setVisibility(View.VISIBLE);
+                            }
                         }
                         else if(x > ev.getX() && y < ev.getY()){
-                            Dv.setVisibility(View.INVISIBLE);
-                            Dv.setX(ev.getX()); Dv.setY(y);
                             width = x - ev.getX();
                             height = ev.getY() - y;
-                            Dv.setWidth((int)width); Dv.setHeight((int)height);
-                            Dv.setVisibility(View.VISIBLE);
+                            if(userPolygon == 0){
+                                poly.setVisibility(View.INVISIBLE);
+                                poly.setX(ev.getX()); poly.setY(y);
+                                poly.setWidth((int)width); poly.setHeight((int)height);
+                                poly.setColor(userTextColor);
+                                poly.setShape(poly.RECT);
+                                poly.setVisibility(View.VISIBLE);
+                            }else if(userPolygon == 1){
+                                poly.setVisibility(View.INVISIBLE);
+                                poly.setX(ev.getX()); poly.setY(y);
+                                poly.setWidth((int)width); poly.setHeight((int)height);
+                                poly.setColor(userTextColor);
+                                poly.setShape(poly.ROUND);
+                                poly.setVisibility(View.VISIBLE);
+                            }else{
+                                Dv.setVisibility(View.INVISIBLE);
+                                Dv.setX(ev.getX());Dv.setY(y);
+                                Dv.setWidth((int) width);Dv.setHeight((int) height);
+                                Dv.setVisibility(View.VISIBLE);
+                            }
                         }
                         break;
                     case MotionEvent.ACTION_CANCEL:
                         Dv.setVisibility(View.INVISIBLE);
+                        userPolygon = -1;
                         break;
                     case MotionEvent.ACTION_UP:
-                        Dv.setVisibility(View.INVISIBLE);
-                        selectList.clear();
-                        for(int i = 0; i < 100; i++){
-                            if(Iv[i].getVisibility() == View.VISIBLE && Iv[i].getX() > Dv.getX() && Iv[i].getY() > Dv.getY() && Iv[i].getX() + Iv[i].getWidth() < Dv.getX() + width && Iv[i].getY() + Iv[i].getHeight() < Dv.getY() + height){
-                                selectList.add(i);
+                        if(userPolygon != 1 && userPolygon != 0) {
+                            Dv.setVisibility(View.INVISIBLE);
+                            selectList.clear();
+                            selectPolygonArrayList.clear();
+                            for (int i = 0; i < 100; i++) {
+                                if (Iv[i].getVisibility() == View.VISIBLE && Iv[i].getX() > Dv.getX() && Iv[i].getY() > Dv.getY() && Iv[i].getX() + Iv[i].getWidth() < Dv.getX() + width && Iv[i].getY() + Iv[i].getHeight() < Dv.getY() + height) {
+                                    selectList.add(i);
+                                }
+                            }
+                            for(int i = 0; i < polygonArrayList.size(); i++){
+                                if(polygonArrayList.get(i).getVisibility() == View.VISIBLE && polygonArrayList.get(i).getX() > Dv.getX() && polygonArrayList.get(i).getY() > Dv.getY() && polygonArrayList.get(i).getX() + polygonArrayList.get(i).getWidth() < Dv.getX() + width && polygonArrayList.get(i).getY() + polygonArrayList.get(i).getHeight() < Dv.getY() + height)
+                                    selectPolygonArrayList.add(polygonArrayList.get(i));
+                            }
+                            for (int i = 0; i < 100; i++) {
+                                Iv[i].setBackgroundColor(Color.TRANSPARENT);
+                                Iv[i].setAlpha((float) 1);
+                            }
+                            for (int i = 0; i < selectList.size(); i++) {
+                                Iv[selectList.get(i)].setBackgroundColor(Color.CYAN);
+                                Iv[selectList.get(i)].setAlpha((float) 0.5);
+                            }
+                            for(int i = 0; i < polygonArrayList.size(); i++){
+                                polygonArrayList.get(i).setBackgroundColor(Color.TRANSPARENT);
+                                polygonArrayList.get(i).setAlpha((float)1);
+                            }
+                            for(int i = 0; i < selectPolygonArrayList.size(); i++){
+                                selectPolygonArrayList.get(i).setBackgroundColor(Color.CYAN);
+                                selectPolygonArrayList.get(i).setAlpha((float)0.5);
                             }
                         }
-                        for(int i = 0; i < 100; i++){
-                            Iv[i].setBackgroundColor(Color.TRANSPARENT);
-                            Iv[i].setAlpha((float)1);
-                        }
-                        for(int i = 0; i < selectList.size();i++){
-                            Iv[selectList.get(i)].setBackgroundColor(Color.CYAN);
-                            Iv[selectList.get(i)].setAlpha((float)0.5);
-                        }
+                        else
+                            userPolygon = -1;
                         break;
                     default:
                         return false;
@@ -240,7 +384,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         line_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-
+                outlineChange(position);
+            }
+        });
+        btn_polygon = (Button)findViewById(R.id.polygonButton);
+        polygon_list = new ListPopupWindow(this);
+        polygon_list.setHeight(300);
+        polygon_list.setWidth(300);
+        polygon_list.setAnchorView(btn_polygon);
+        polygon_list.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, str_polygon));
+        polygon_list.setModal(true);
+        polygon_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+                setUserPolygon(position);
             }
         });
         et = (EditText) findViewById(R.id.edittext);
@@ -271,25 +428,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         paint.setColor(iinfo[index].getTextColor());
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(tf[iinfo[index].getTfNum()]);
+        paint.setTextSkewX(iinfo[index].getSkew());
+        paint.setUnderlineText(iinfo[index].getUnderline());
 
-        Paint strokePaint = new Paint(ANTI_ALIAS_FLAG);
-        strokePaint.setTextSize(iinfo[index].getTextSize());
-        strokePaint.setColor(iinfo[index].getStrokeColor());
-        strokePaint.setStyle(Paint.Style.STROKE);
-        strokePaint.setTextAlign(Paint.Align.LEFT);
-        strokePaint.setTypeface(tf[iinfo[index].getTfNum()]);
-        strokePaint.setStrokeWidth(iinfo[index].getStrokeWidth());
+            Paint strokePaint = new Paint(ANTI_ALIAS_FLAG);
+            strokePaint.setTextSize(iinfo[index].getTextSize());
+            strokePaint.setColor(iinfo[index].getStrokeColor());
+            strokePaint.setStyle(Paint.Style.STROKE);
+            strokePaint.setTextAlign(Paint.Align.LEFT);
+            strokePaint.setTypeface(tf[iinfo[index].getTfNum()]);
+            strokePaint.setStrokeWidth(iinfo[index].getStrokeWidth());
+            strokePaint.setTextSkewX(iinfo[index].getSkew());
 
-        float baseline = -strokePaint.ascent(); // ascent() is negative
-        int width = (int) (strokePaint.measureText(text) + 0.5f) + userStrokeWidth; // round
-        int height = (int) (baseline + strokePaint.descent() + 0.5f) + userStrokeWidth;
+            float baseline = -strokePaint.ascent(); // ascent() is negative
+            int width = (int) (strokePaint.measureText(text) + 0.5f) + userStrokeWidth; // round
+            int height = (int) (baseline + strokePaint.descent() + 0.5f) + userStrokeWidth;
 
-        Bitmap image = createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Bitmap image = createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(image);
-        //canvas.translate(baseline,0);
-        //canvas.rotate(userRotate,width / 2, height / 2);
-        canvas.drawText(text,0,baseline, strokePaint);
+        if(iinfo[index].getStrokeWidth() >0) {
+            canvas.drawText(text, 0, baseline, strokePaint);
+
+        }
         canvas.drawText(text, 0, baseline, paint);
 
         return image;
@@ -364,6 +525,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public void outlineChange(int position) {
+        switch (position) {
+            case 0:
+                if (et.getText().toString().length() > 0) {
+                    for (int i = 0; i < selectList.size(); i++) {
+                        if (iinfo[selectList.get(i)].getStrokeWidth() > 0) {
+                            userStrokeWidth = 0;
+                        } else if (iinfo[selectList.get(i)].getStrokeWidth() == 0) {
+                            userStrokeWidth = 10;
+                        }
+                        iinfo[selectList.get(i)].setStrokeWidth(userStrokeWidth);
+                    }
+                        initIv(str.setText());
+
+                }
+                break;
+            case 1:
+                click = 1;
+                onClick(Dv);
+                break;
+        }
+    }
+
     public void onbtnClicked(View v)
     {
         if(list.isShowing())
@@ -378,6 +562,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             line_list.dismiss();
         else
             line_list.show();
+    }
+    public void skewClicked(View v)
+    {
+            if (et.getText().toString().length() > 0) {
+                for (int i = 0; i < selectList.size(); i++) {
+                    if (iinfo[selectList.get(i)].getSkew()  ==  0)
+                    {
+                        userSkew = -0.25f;
+                    }
+                    else
+                    {
+                        userSkew = 0;
+                    }
+                    iinfo[selectList.get(i)].setSkew(userSkew);
+                }
+                initIv(str.setText());
+            }
+        }
+
+    public void underlineClicked(View v)
+    {
+
+            if (et.getText().toString().length() > 0) {
+                for (int i = 0; i < selectList.size(); i++) {
+                    if (iinfo[selectList.get(i)].getUnderline()  ==  true)
+                    {
+                        userUnderline = false;
+                    }
+                    else
+                    {
+                        userUnderline = true;
+                    }
+                    iinfo[selectList.get(i)].setUnderline(userUnderline);
+                }
+                initIv(str.setText());
+            }
+        }
+
+
+    public void setUserPolygon(int position){
+        switch(position){
+            case 0:
+                userPolygon = 0;
+                break;
+            case 1:
+                userPolygon = 1;
+                break;
+            case 2:
+                userPolygon = 2;
+                break;
+        }
+    }
+
+    public void onPolygonBtnClicked(View v){
+        if(polygon_list.isShowing())
+            polygon_list.dismiss();
+        else
+            polygon_list.show();
     }
 
     public void fontsizeupClicked(View v)
@@ -440,48 +682,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private static final char[] CHO =
-		/*ㄱ ㄲ ㄴ ㄷ ㄸ ㄹ ㅁ ㅂ ㅃ ㅅ ㅆ ㅇ ㅈ ㅉ ㅊ ㅋ ㅌ ㅍ ㅎ */
-            {0x3131, 0x3132, 0x3134, 0x3137, 0x3138, 0x3139, 0x3141, 0x3142, 0x3143, 0x3145,
-                    0x3146, 0x3147, 0x3148, 0x3149, 0x314a, 0x314b, 0x314c, 0x314d, 0x314e};
-    private static final char[] JUN =
-		/*ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ*/
-            {0x314f, 0x3150, 0x3151, 0x3152, 0x3153, 0x3154, 0x3155, 0x3156, 0x3157, 0x3158,
-                    0x3159, 0x315a, 0x315b, 0x315c, 0x315d, 0x315e, 0x315f, 0x3160,	0x3161,	0x3162,
-                    0x3163};
-    /*X ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ*/
-    private static final char[] JON =
-            {0x0000, 0x3131, 0x3132, 0x3133, 0x3134, 0x3135, 0x3136, 0x3137, 0x3139, 0x313a,
-                    0x313b, 0x313c, 0x313d, 0x313e, 0x313f, 0x3140, 0x3141, 0x3142, 0x3144, 0x3145,
-                    0x3146, 0x3147, 0x3148, 0x314a, 0x314b, 0x314c, 0x314d, 0x314e};
-
-    public String jamo()  //editText의 내용을 자모분리한 문자열 리턴
-    {
-        String str = et.getText().toString();
-        int a,b,c;
-        String result = "";
-        char ch;
-        for(int i = 0; i < str.length(); i++)
-        {
-            ch = str.charAt(i);
-            if(ch >= 0xAC00 && ch <= 0xD7A3) //한글이면 분해
-            {
-                c = ch - 0xAC00;
-                a = c / (21 * 28);
-                c = c % (21 * 28);
-                b = c / 28;
-                c = c % 28;
-
-                result = result + CHO[a] + JUN[b];
-                if(c != 0)
-                    result += JON[c];
-            }
-            else //한글이 아니면
-                result += ch;
-        }
-        return result;
-    }
-
     public void initIv(String str)
     {
         for(int i = 0; i < 100; i++) {
@@ -519,12 +719,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void colorChanged(int color) {
         PreferenceManager.getDefaultSharedPreferences(this).edit().putInt("color", color).commit();
-        userTextColor = color;
-        if(et.getText().toString().length() > 0) {
-            for (int i = 0; i < selectList.size(); i++) {
-                iinfo[selectList.get(i)].setTextColor(userTextColor);
+        if(click == 1) {
+            userStrokeColor = color;
+            if (et.getText().toString().length() > 0) {
+                for (int i = 0; i < selectList.size(); i++) {
+                    iinfo[selectList.get(i)].setStrokeColor(userStrokeColor);
+                }
+                initIv(str.setText());
             }
-            initIv(jamo());
+            click = 0;
+        }
+        else {
+            userTextColor = color;
+            if (et.getText().toString().length() > 0) {
+                for (int i = 0; i < selectList.size(); i++) {
+                    iinfo[selectList.get(i)].setTextColor(userTextColor);
+                }
+                initIv(str.setText());
+            }
+        }
+        for(int i = 0; i < selectPolygonArrayList.size(); i++){
+            selectPolygonArrayList.get(i).setColor(color);
+            selectPolygonArrayList.get(i).invalidate();
         }
     }
     @RequiresApi(api = Build.VERSION_CODES.M)

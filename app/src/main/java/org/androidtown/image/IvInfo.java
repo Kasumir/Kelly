@@ -11,6 +11,8 @@ public class IvInfo {
     private int strokeWidth;
     private int strokeColor;
     private int tfNum;
+    private boolean underline;
+    private float skew;
 
     public IvInfo()
     {
@@ -19,6 +21,8 @@ public class IvInfo {
         strokeWidth = MainActivity.userStrokeWidth;
         strokeColor = MainActivity.userStrokeColor;
         tfNum = MainActivity.userfont;
+        underline = MainActivity.userUnderline;
+        skew = MainActivity.userSkew;
     }
     public void setX(float x){this.x = x;}
 
@@ -35,6 +39,14 @@ public class IvInfo {
     public void setTextColor(int tc){this.textColor = tc;}
 
     public int getTextColor(){return textColor;}
+
+    public void setUnderline(boolean a){this.underline = a;}
+
+    public boolean getUnderline(){return underline;}
+
+    public void setSkew(float sk){this.skew = sk;}
+
+    public float getSkew(){return skew;}
 
     public void setStrokeWidth(int strokeWidth){this.strokeWidth = strokeWidth;}
 
