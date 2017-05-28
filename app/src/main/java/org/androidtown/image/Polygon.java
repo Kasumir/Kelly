@@ -54,7 +54,7 @@ public class Polygon extends View{
 
     public void setWidth(int width){this.width = width;}
     public void setHeight(int height){this.height = height;}
-    public void setColor(int c){color = c;}
+    public void setColor(int c){paint.setColor(c);}
     public void setShape(int q){
         if(q == RECT || q == ROUND)
             shape = q;
