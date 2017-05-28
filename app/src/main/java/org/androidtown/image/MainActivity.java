@@ -1,7 +1,6 @@
 package org.androidtown.image;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -35,10 +34,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static android.app.PendingIntent.getActivity;
 import static android.graphics.Bitmap.createBitmap;
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
-import static android.os.Parcelable.CONTENTS_FILE_DESCRIPTOR;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, ColorPickerDialog.OnColorChangedListener{
     private static final int MY_PERMISSION_REQUEST_STORAGE = 100;
@@ -46,12 +43,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static int userfont = 0;
     public static float userTextSize = 80;
     public static int userTextColor = Color.BLACK;
-    public static int userStrokeWidth = 10;
+    public static int userStrokeWidth = 0;
     public static int userStrokeColor = Color.RED;
     public static int userPolygon = -1;
+    public static boolean userUnderline = false;
+    public static float userSkew= 0;
+    public static int click = 0;
     //
 
     Button btn_colorPicker;
+    Button btn_Outline;
     int color;
     Button btn_capture;
     LinearLayout screen = null;
@@ -337,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         line_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-
+                outlineChange(position);
             }
         });
         btn_polygon = (Button)findViewById(R.id.polygonButton);
@@ -381,23 +382,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         paint.setColor(iinfo[index].getTextColor());
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(tf[iinfo[index].getTfNum()]);
+        paint.setTextSkewX(iinfo[index].getSkew());
+        paint.setUnderlineText(iinfo[index].getUnderline());
 
-        Paint strokePaint = new Paint(ANTI_ALIAS_FLAG);
-        strokePaint.setTextSize(iinfo[index].getTextSize());
-        strokePaint.setColor(iinfo[index].getStrokeColor());
-        strokePaint.setStyle(Paint.Style.STROKE);
-        strokePaint.setTextAlign(Paint.Align.LEFT);
-        strokePaint.setTypeface(tf[iinfo[index].getTfNum()]);
-        strokePaint.setStrokeWidth(iinfo[index].getStrokeWidth());
+            Paint strokePaint = new Paint(ANTI_ALIAS_FLAG);
+            strokePaint.setTextSize(iinfo[index].getTextSize());
+            strokePaint.setColor(iinfo[index].getStrokeColor());
+            strokePaint.setStyle(Paint.Style.STROKE);
+            strokePaint.setTextAlign(Paint.Align.LEFT);
+            strokePaint.setTypeface(tf[iinfo[index].getTfNum()]);
+            strokePaint.setStrokeWidth(iinfo[index].getStrokeWidth());
+            strokePaint.setTextSkewX(iinfo[index].getSkew());
 
-        float baseline = -strokePaint.ascent(); // ascent() is negative
-        int width = (int) (strokePaint.measureText(text) + 0.5f) + userStrokeWidth; // round
-        int height = (int) (baseline + strokePaint.descent() + 0.5f) + userStrokeWidth;
+            float baseline = -strokePaint.ascent(); // ascent() is negative
+            int width = (int) (strokePaint.measureText(text) + 0.5f) + userStrokeWidth; // round
+            int height = (int) (baseline + strokePaint.descent() + 0.5f) + userStrokeWidth;
 
-        Bitmap image = createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Bitmap image = createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(image);
-        canvas.drawText(text,0,baseline, strokePaint);
+        if(iinfo[index].getStrokeWidth() >0) {
+            canvas.drawText(text, 0, baseline, strokePaint);
+
+        }
         canvas.drawText(text, 0, baseline, paint);
 
         return image;
@@ -472,6 +479,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public void outlineChange(int position) {
+        switch (position) {
+            case 0:
+                if (et.getText().toString().length() > 0) {
+                    for (int i = 0; i < selectList.size(); i++) {
+                        if (iinfo[selectList.get(i)].getStrokeWidth() > 0) {
+                            userStrokeWidth = 0;
+                        } else if (iinfo[selectList.get(i)].getStrokeWidth() == 0) {
+                            userStrokeWidth = 10;
+                        }
+                        iinfo[selectList.get(i)].setStrokeWidth(userStrokeWidth);
+                    }
+                        initIv(str.setText());
+
+                }
+                break;
+            case 1:
+                click = 1;
+                onClick(Dv);
+                break;
+        }
+    }
+
     public void onbtnClicked(View v)
     {
         if(list.isShowing())
@@ -487,6 +517,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else
             line_list.show();
     }
+    public void skewClicked(View v)
+    {
+            if (et.getText().toString().length() > 0) {
+                for (int i = 0; i < selectList.size(); i++) {
+                    if (iinfo[selectList.get(i)].getSkew()  ==  0)
+                    {
+                        userSkew = -0.25f;
+                    }
+                    else
+                    {
+                        userSkew = 0;
+                    }
+                    iinfo[selectList.get(i)].setSkew(userSkew);
+                }
+                initIv(str.setText());
+            }
+        }
+
+    public void underlineClicked(View v)
+    {
+
+            if (et.getText().toString().length() > 0) {
+                for (int i = 0; i < selectList.size(); i++) {
+                    if (iinfo[selectList.get(i)].getUnderline()  ==  true)
+                    {
+                        userUnderline = false;
+                    }
+                    else
+                    {
+                        userUnderline = true;
+                    }
+                    iinfo[selectList.get(i)].setUnderline(userUnderline);
+                }
+                initIv(str.setText());
+            }
+        }
+
 
     public void setUserPolygon(int position){
         switch(position){
@@ -605,13 +672,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void colorChanged(int color) {
+
         PreferenceManager.getDefaultSharedPreferences(this).edit().putInt("color", color).commit();
-        userTextColor = color;
-        if(et.getText().toString().length() > 0) {
-            for (int i = 0; i < selectList.size(); i++) {
-                iinfo[selectList.get(i)].setTextColor(userTextColor);
+        if(click == 1) {
+            userStrokeColor = color;
+            if (et.getText().toString().length() > 0) {
+                for (int i = 0; i < selectList.size(); i++) {
+                    iinfo[selectList.get(i)].setStrokeColor(userStrokeColor);
+                }
+                initIv(str.setText());
             }
-            initIv(str.setText());
+            click = 0;
+        }
+        else {
+            userTextColor = color;
+            if (et.getText().toString().length() > 0) {
+                for (int i = 0; i < selectList.size(); i++) {
+                    iinfo[selectList.get(i)].setTextColor(userTextColor);
+                }
+                initIv(str.setText());
+            }
         }
     }
     @RequiresApi(api = Build.VERSION_CODES.M)

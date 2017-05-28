@@ -14,32 +14,34 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="5"
-            >
+            android:layout_weight="5">
 
             <ListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true" />
+                android:layout_centerVertical="true"
+                android:id="@+id/listView" />
 
             <Button
                 android:id="@+id/btn_outline"
                 android:layout_width="100dp"
                 android:layout_height="60dp"
-                android:onClick="onbtnClicked2"
-                android:text="테두리"
                 android:layout_alignParentBottom="true"
+                android:layout_marginStart="10dp"
                 android:layout_toEndOf="@+id/btn_colorPicker"
-                android:layout_marginStart="10dp" />
+                android:onClick="onbtnClicked2"
+                android:text="테두리" />
+
             <Button
                 android:id="@+id/button"
                 android:layout_width="100dp"
                 android:layout_height="60dp"
-                android:onClick="onbtnClicked"
-                android:background="@drawable/font"
-                android:layout_alignParentTop="true"
+                android:layout_alignBottom="@+id/btn_colorPicker"
                 android:layout_alignParentEnd="true"
-                android:layout_alignBottom="@+id/btn_colorPicker" />
+                android:layout_alignParentTop="true"
+                android:background="@drawable/font"
+                android:onClick="onbtnClicked" />
+
             <Button
                 android:id="@+id/btn_colorPicker"
                 android:layout_width="wrap_content"
@@ -65,6 +67,26 @@
                 android:layout_toStartOf="@+id/polygonButton"
                 android:onClick="onSeperateBtnClicked"
                 android:text="쪼개기" />
+
+            <Button
+                android:id="@+id/button4"
+                android:layout_width="50dp"
+                android:layout_height="60dp"
+                android:layout_alignTop="@+id/btn_outline"
+                android:layout_marginStart="50dp"
+                android:layout_toEndOf="@+id/polygonButton"
+                android:onClick="skewClicked"
+                android:text="/" />
+
+            <Button
+                android:id="@+id/button5"
+                android:layout_width="50dp"
+                android:layout_height="60dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="34dp"
+                android:layout_toStartOf="@+id/btn_outline"
+                android:onClick="underlineClicked"
+                android:text="_" />
         </RelativeLayout>
 
         <RelativeLayout
