@@ -61,11 +61,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button btn_capture;
     LinearLayout screen = null;
     public static EditText et;
-    private Typeface[] tf = new Typeface[7];
+    private Typeface[] tf = new Typeface[10];
     private Button btn, btn_line, btn_polygon;
     private ListPopupWindow list, line_list, polygon_list;
     private RelativeLayout rl;
-    private String[] font = {"나눔", "나눔바른고딕", "나눔바른고딕볼드", "나눔바른펜", "나눔핸드브러시","나눔명조-옛한글", "나눔펜"};
+    private String[] font = {"나눔", "나눔바른고딕", "나눔바른고딕볼드", "나눔바른펜", "나눔핸드브러시","나눔명조-옛한글", "나눔펜", "tvN행복한이야기","Hans캘리","Hans캘리러브"};
     private String[] str_line = {"굵기", "색깔"};
     private String[] str_polygon = {"사각형", "원", "지우기"};
     private int ivFocus;
@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         HorizontalScrollView hv = (HorizontalScrollView)findViewById(R.id.scroll);
-        r2 = (RelativeLayout)findViewById(R.id.layout_in_scroll);
         hv.setHorizontalScrollBarEnabled(true);
         screen = (LinearLayout)findViewById(R.id.Screen);
         btn_capture = (Button)findViewById(R.id.btn_Capture);
@@ -98,6 +97,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             tf[4] = Typeface.createFromAsset(getAssets(), "Nanumhandbrush.ttf");
             tf[5] = Typeface.createFromAsset(getAssets(), "NanumMyeongjo-YetHangul.otf");
             tf[6] = Typeface.createFromAsset(getAssets(), "NanumPen.ttf");
+            tf[7] = Typeface.createFromAsset(getAssets(), "tvN_happyLight.ttf");
+            tf[8] = Typeface.createFromAsset(getAssets(), "HanS_Calli.ttf");
+            tf[9] = Typeface.createFromAsset(getAssets(), "HanS_CalliLove.ttf");
         //init user input value
         //init UI
         rl = (RelativeLayout) findViewById(R.id.RL);
@@ -363,7 +365,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         btn = (Button) findViewById(R.id.button);
         list = new ListPopupWindow(this);
-        list.setWidth(300);
+        list.setWidth(350);
         list.setHeight(300);
         list.setAnchorView(btn);
         list.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, font));
@@ -515,6 +517,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case 6:
                 userfont = 6;
+                if(et.getText().toString().length() > 0)
+                {
+                    for(int i = 0; i < selectList.size(); i++)
+                        iinfo[selectList.get(i)].setTfNum(userfont);
+                    initIv(str.setText());
+                }
+                break;
+            case 7:
+                userfont = 7;
+                if(et.getText().toString().length() > 0)
+                {
+                    for(int i = 0; i < selectList.size(); i++)
+                        iinfo[selectList.get(i)].setTfNum(userfont);
+                    initIv(str.setText());
+                }
+                break;
+            case 8:
+                userfont = 8;
+                if(et.getText().toString().length() > 0)
+                {
+                    for(int i = 0; i < selectList.size(); i++)
+                        iinfo[selectList.get(i)].setTfNum(userfont);
+                    initIv(str.setText());
+                }
+                break;
+            case 9:
+                userfont = 9;
                 if(et.getText().toString().length() > 0)
                 {
                     for(int i = 0; i < selectList.size(); i++)
