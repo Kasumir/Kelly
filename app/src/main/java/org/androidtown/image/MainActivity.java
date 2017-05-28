@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             v.animate().x(ev.getRawX() + x).y(ev.getRawY() + y).setDuration(0).start(); // 이동시켜주는함수.
                             iinfo[ivFocus].setX(ev.getRawX() + x);
                             iinfo[ivFocus].setY(ev.getRawY() + y);
+
                         }
                         break;
                         case MotionEvent.ACTION_CANCEL: //터치모션 캔슬되었을 때. 아무것도안함.
