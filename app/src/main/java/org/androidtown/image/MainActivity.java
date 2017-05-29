@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ListPopupWindow list, line_list, polygon_list;
     private RelativeLayout rl;
     private String[] font = {"나눔", "나눔바른고딕", "나눔바른고딕볼드", "나눔바른펜", "나눔핸드브러시","나눔명조-옛한글", "나눔펜", "tvN행복한이야기","Hans캘리","Hans캘리러브"};
-    private String[] str_line = {"굵기", "색깔"};
+    private String[] str_line = {"유무", "색깔"};
     private String[] str_polygon = {"사각형", "원", "지우기"};
     private int ivFocus;
     private int i;
@@ -378,8 +378,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         btn_line = (Button)findViewById(R.id.btn_outline);
         line_list = new ListPopupWindow(this);
-        line_list.setWidth(300);
-        line_list.setHeight(300);
+        line_list.setWidth(100);
+        line_list.setHeight(100);
         line_list.setAnchorView(btn_line);
         line_list.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, str_line));
         line_list.setModal(true);
@@ -391,8 +391,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         btn_polygon = (Button)findViewById(R.id.polygonButton);
         polygon_list = new ListPopupWindow(this);
-        polygon_list.setHeight(300);
-        polygon_list.setWidth(300);
+        polygon_list.setHeight(100);
+        polygon_list.setWidth(100);
         polygon_list.setAnchorView(btn_polygon);
         polygon_list.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, str_polygon));
         polygon_list.setModal(true);
