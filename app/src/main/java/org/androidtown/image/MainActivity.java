@@ -3,11 +3,14 @@ package org.androidtown.image;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -36,10 +39,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static android.app.PendingIntent.getActivity;
 import static android.graphics.Bitmap.createBitmap;
 import static android.graphics.Paint.ANTI_ALIAS_FLAG;
-import static android.os.Parcelable.CONTENTS_FILE_DESCRIPTOR;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, ColorPickerDialog.OnColorChangedListener{
     private static final int MY_PERMISSION_REQUEST_STORAGE = 100;
@@ -159,8 +160,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onClick(View view) {
                 checkPermission();
                 rl.setDrawingCacheEnabled(true);
+                Resources res = getResources();
+                Drawable drawable = res.getDrawable(R.drawable.background1);
+                rl.setBackgroundColor(Color.WHITE);
                 Bitmap bm = rl.getDrawingCache();
                 saveScreenImage(bm);
+                rl.setBackground(drawable);
             }
         });
         rl.setOnTouchListener(new View.OnTouchListener(){
@@ -828,13 +833,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void saveScreenImage(Bitmap bm){
         FileOutputStream stream;
-        String path = "/mnt/sdcard/DCIM/" + "a.png";
+        String path = "/mnt/sdcard/DCIM/CAMERA/" + "a.png";
         try{
             stream = new FileOutputStream(path);
             bm.compress(Bitmap.CompressFormat.PNG, 90,stream);
         }catch(FileNotFoundException e){
             e.printStackTrace();
         }
+        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+
+        Uri uri = Uri.parse("file:/mnt/sdcard/DCIM/CAMERA/a.png");
+
+        intent.setData(uri);
+
+        sendBroadcast(intent);
     }
 }
 
