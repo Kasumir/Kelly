@@ -57,8 +57,9 @@ public class HeeActivity extends AppCompatActivity {
         //b2.setVisibility(View.GONE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hejee);
-    }
 
+    }
+/*
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkPermission() {
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -97,7 +98,7 @@ public class HeeActivity extends AppCompatActivity {
                 break;
         }
     }
-
+*/
     private void writeFile() {
         File file = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "temp.txt");
         try {
@@ -139,8 +140,8 @@ public class HeeActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-   /* public void onButton3Clicked(View v) {
-        checkPermission();
+    public void onButton3Clicked(View v) {
+
         View b = findViewById(R.id.button1);
         b.setVisibility(View.GONE);
         View b2 = findViewById(R.id.button2);
@@ -149,9 +150,10 @@ public class HeeActivity extends AppCompatActivity {
         b3.setVisibility(View.GONE);
 
         }
-*/
+
 
     public void onButton4Clicked(View v) {
+       // checkPermission();
         //Intent intent = new Intent(Intent.);
         View b = findViewById(R.id.button1);
         b.setVisibility(View.GONE);
