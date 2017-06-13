@@ -30,10 +30,10 @@
         android:id="@+id/button4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onButton4Clicked"
-        android:text="저장하기"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:onClick="onButton4Clicked"
+        android:text="저장하기" />
 
     <TextView
         android:id="@+id/button2"

@@ -59,7 +59,7 @@ public class HeeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_hejee);
 
     }
-/*
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkPermission() {
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -98,7 +98,7 @@ public class HeeActivity extends AppCompatActivity {
                 break;
         }
     }
-*/
+
     private void writeFile() {
         File file = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "temp.txt");
         try {
@@ -139,8 +139,8 @@ public class HeeActivity extends AppCompatActivity {
         return imgName;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public void onButton3Clicked(View v) {
+   @RequiresApi(api = Build.VERSION_CODES.M)
+/*    public void onButton3Clicked(View v) {
 
         View b = findViewById(R.id.button1);
         b.setVisibility(View.GONE);
@@ -151,16 +151,16 @@ public class HeeActivity extends AppCompatActivity {
 
         }
 
-
+*/
     public void onButton4Clicked(View v) {
-       // checkPermission();
+        checkPermission();
         //Intent intent = new Intent(Intent.);
         View b = findViewById(R.id.button1);
         b.setVisibility(View.GONE);
         View b2 = findViewById(R.id.button2);
         b2.setVisibility(View.GONE);
-        View b3 = findViewById(R.id.button3);
-        b3.setVisibility(View.GONE);
+       // View b3 = findViewById(R.id.button3);
+      //  b3.setVisibility(View.GONE);
         View rootView = getWindow().getDecorView();
         File screenShot = ScreenShot(rootView);
         if (screenShot != null) {
